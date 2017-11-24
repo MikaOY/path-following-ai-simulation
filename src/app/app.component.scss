@@ -5,13 +5,12 @@ div.full-width {
 }
 
 canvas {
+  margin: 1em; 
   border: 1px solid gray;
 }
 
-div.col-option {
-  position: relative; 
-  z-index: 10; 
-  width: 30px;
-  height: 30px;
-  margin: 0.5em; 
+input.btn {
+  display: block; 
+  width: 10%; 
+  margin: 0 auto 3em auto;   
 }

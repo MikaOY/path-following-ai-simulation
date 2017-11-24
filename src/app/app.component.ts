@@ -8,17 +8,16 @@ import { Component, OnInit } from '@angular/core';
 
 export class AppComponent implements OnInit {
   canvas: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D; 
-  flag = false; 
+  ctx: CanvasRenderingContext2D;
+  flag = false;
   prevX = 0;
   currX = 0;
   prevY = 0;
   currY = 0;
   dot_flag = false;
-  activeColor: string = "black"; 
   y = 2;
-  canvasWidth: number; 
-  canvasHeight: number; 
+  canvasWidth: number;
+  canvasHeight: number;
 
   ngOnInit() {
     this.canvas = document.getElementById('mah-canvas') as HTMLCanvasElement;
@@ -57,44 +56,16 @@ export class AppComponent implements OnInit {
     }
   }
 
-  color(obj) {
-    console.log('Color picked!'); 
-    switch (obj.id) {
-      case "green":
-        this.activeColor = "green";
-        break;
-      case "blue":
-        this.activeColor = "blue";
-        break;
-      case "red":
-        this.activeColor = "red";
-        break;
-      case "yellow":
-        this.activeColor = "yellow";
-        break;
-      case "orange":
-        this.activeColor = "orange";
-        break;
-      case "black":
-        this.activeColor = "black";
-        break;
-      case "white":
-        this.activeColor = "white";
-        break;
-    }
-
-    if (this.activeColor == "white") this.y = 14;
-    else this.y = 2;
-  }
-
   draw() {
-    this.ctx.beginPath();
-    this.ctx.moveTo(this.prevX, this.prevY);
-    this.ctx.lineTo(this.currX, this.currY);
-    this.ctx.strokeStyle = this.activeColor;
-    this.ctx.lineWidth = this.y;
-    this.ctx.stroke();
-    this.ctx.closePath();
+    //if (Math.sqrt((this.prevX - this.currX) ^ 2 + (this.prevY - this.currY) ^ 2) > 3) {
+      this.ctx.beginPath();
+      this.ctx.moveTo(this.prevX, this.prevY);
+      this.ctx.lineTo(this.currX, this.currY);
+      this.ctx.strokeStyle = "black";
+      this.ctx.lineWidth = this.y;
+      this.ctx.stroke();
+      this.ctx.closePath();
+    //}
   }
 
   erase() {
@@ -116,7 +87,7 @@ export class AppComponent implements OnInit {
       this.dot_flag = true;
       if (this.dot_flag) {
         this.ctx.beginPath();
-        this.ctx.fillStyle = this.activeColor;
+        this.ctx.fillStyle = "black";
         this.ctx.fillRect(this.currX, this.currY, 2, 2);
         this.ctx.closePath();
         this.dot_flag = false;
