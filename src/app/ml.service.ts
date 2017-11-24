@@ -16,7 +16,7 @@ export class MlService {
     var newPos = this.getPos();
 
     var posChange = this.getPosChange(pos, newPos);
-    this.record(cmd, posChange.tetha, posChange.r);
+    this.record(cmd, posChange.x, posChange.y);
   }
 
   /** get command as input from user */
@@ -24,7 +24,7 @@ export class MlService {
     // get user input for random command 
   }
 
-  /** get bot's current polar position */
+  /** get bot's current Cartesian position */
   getPos() {
     // get bot absolute position
   }
@@ -41,16 +41,16 @@ export class MlService {
 
   /** 
    * get difference between given positions 
-   * @returns {{tetha, r}} - change in polar positions, in polar format
+   * @returns {{x, y}} - change in Cartesian coordinates
    */
-  getPosChange(pos, newPos): { tetha: number, r: number } {
+  getPosChange(pos, newPos): { x: number, y: number } {
     // get current position diff from given
-    return { tetha: 5, r: 5 }; 
+    return { x: 5, y: 5 }; 
   }
 
   /**
    * attempt to follow path defined by an array of points
-   * @param {{tetha, r}[]} pointsArray - Array of points that define the path to follow. 
+   * @param {{x, y}[]} pointsArray - Array of points that define the path to follow. 
    */
   work(pointsArr) {
     pointsArr.forEach((point) => {
@@ -63,11 +63,11 @@ export class MlService {
 
   /**
    * move bot to point specified
-   * @param {{tetha, r}} point - absolute polar (tetha, r) point
+   * @param {{x, y}} point - absolute (x, r) point
    */
   move(point) {
-    var polarMoveDistance = this.getPosChange(this.getPos(), point);
-    // look for match in ML
+    var moveDistance = this.getPosChange(this.getPos(), point);
+    // query ML for extrapolated command
     // move bot to point, animated, with delay to show movement
   }
 
