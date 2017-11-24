@@ -21,12 +21,17 @@ export class AppComponent implements OnInit {
   canvasWidth: number;
   canvasHeight: number;
 
+  xCmd: number; 
+  yCmd: number; 
+
   pointsArray: any[] = [];
   cleanPointsArray: any[] = [];
 
   constructor(private mlService: MlService) { }
 
   ngOnInit() {
+    // path-drawing //
+
     this.canvas = document.getElementById('mah-canvas') as HTMLCanvasElement;
 
     if (this.canvas.getContext) {
@@ -64,6 +69,37 @@ export class AppComponent implements OnInit {
 
     // path doesn't close until log points called
     this.ctx.beginPath();
+  }
+
+  findxy(res, e) {
+    if (res == 'down') {
+      this.prevX = this.currX;
+      this.prevY = this.currY;
+      this.currX = e.clientX - this.canvas.offsetLeft;
+      this.currY = e.clientY - this.canvas.offsetTop;
+
+      this.flag = true;
+      this.dot_flag = true;
+      if (this.dot_flag) {
+        this.ctx.beginPath();
+        this.ctx.fillStyle = "black";
+        this.ctx.fillRect(this.currX, this.currY, 2, 2);
+        this.ctx.closePath();
+        this.dot_flag = false;
+      }
+    }
+    if (res == 'up' || res == "out") {
+      this.flag = false;
+    }
+    if (res == 'move') {
+      if (this.flag) {
+        this.prevX = this.currX;
+        this.prevY = this.currY;
+        this.currX = e.clientX - this.canvas.offsetLeft;
+        this.currY = e.clientY - this.canvas.offsetTop;
+        this.draw();
+      }
+    }
   }
 
   draw() {
@@ -118,34 +154,8 @@ export class AppComponent implements OnInit {
     });
   }
 
-  findxy(res, e) {
-    if (res == 'down') {
-      this.prevX = this.currX;
-      this.prevY = this.currY;
-      this.currX = e.clientX - this.canvas.offsetLeft;
-      this.currY = e.clientY - this.canvas.offsetTop;
-
-      this.flag = true;
-      this.dot_flag = true;
-      if (this.dot_flag) {
-        this.ctx.beginPath();
-        this.ctx.fillStyle = "black";
-        this.ctx.fillRect(this.currX, this.currY, 2, 2);
-        this.ctx.closePath();
-        this.dot_flag = false;
-      }
-    }
-    if (res == 'up' || res == "out") {
-      this.flag = false;
-    }
-    if (res == 'move') {
-      if (this.flag) {
-        this.prevX = this.currX;
-        this.prevY = this.currY;
-        this.currX = e.clientX - this.canvas.offsetLeft;
-        this.currY = e.clientY - this.canvas.offsetTop;
-        this.draw();
-      }
-    }
+  train() {
+    console.log(this.xCmd); 
+    console.log(this.yCmd); 
   }
 }

@@ -1,12 +1,35 @@
-<div class="full-width">
-  <canvas id="mah-canvas" width="600" height="500"></canvas>
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="full-width">
+        <canvas id="mah-canvas" width="600" height="500"></canvas>
+        <!-- path draw controls -->
+        <div style="width:100%;">
+          <button type="button" id="clr" class="canvas-btn btn btn-danger" (click)="erase()">Clear path</button>
+          <button type="button" class="canvas-btn btn btn-primary" (click)="logPoints()">Show points</button>
+        </div>
+      </div>
+    </div>
 
-  <!-- path draw controls -->
-  <input class="btn" type="button" value="Clear" id="clr" size="23" (click)="erase()">
-  <input class="btn" type="button" value="Show points" id="clr" size="23" (click)="logPoints()">
+    <div class="col-md-4">
+      <!-- command inputs to train movement --> 
+      <form>
+        <h3>Train model</h3>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Move X</label>
+          <input type="number" class="form-control" placeholder="revolutions">
+        </div>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Move y</label>
+          <input (value)="yCmd" type="number" class="form-control" placeholder="revolutions">
+        </div>
+      </form>
+      <button class="btn btn-primary" (click)="train()">Execute</button>      
+    </div>
+  </div>
 </div>
 
 <div style="text-align:center">
-  <h3>General path-following movement AI, by Tika.</h3>
-  <img width="10%" src="../assets/tika-text.svg">
+  <h4 style="margin-bottom: 1em;">General path-following movement AI, by Tika.</h4>
+  <img style="margin-bottom: 1em;" width="10%" src="../assets/tika-text.svg">
 </div>
