@@ -1,4 +1,6 @@
+
 import { Component, OnInit } from '@angular/core';
+import { MlService } from './ml.service';
 
 @Component({
   selector: 'app-root',
@@ -21,6 +23,8 @@ export class AppComponent implements OnInit {
 
   pointsArray: any[] = [];
   cleanPointsArray: any[] = [];
+
+  constructor(private mlService: MlService) { }
 
   ngOnInit() {
     this.canvas = document.getElementById('mah-canvas') as HTMLCanvasElement;
@@ -95,7 +99,7 @@ export class AppComponent implements OnInit {
       else {
         let latestCleanPoint = this.cleanPointsArray[this.cleanPointsArray.length - 1];
         let dist = Math.sqrt(((latestCleanPoint.x - messyPoint.x) ** 2 + (latestCleanPoint.y - messyPoint.y) ** 2));
-        
+
         if (dist > 30) {
           this.cleanPointsArray.push(messyPoint);
         }
