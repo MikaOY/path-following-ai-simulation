@@ -1,7 +1,19 @@
-
 <div class="full-width">
-  <canvas id="tutorial" width="300" height="300"></canvas>
+  <canvas id="mah-canvas" width="500" height="300"></canvas>
 </div>
+
+<!-- path draw color options -->
+<input type="button" class="col-option" style="background:green;" id="green" (click)="color(this)">
+<div class="col-option" style="background:blue;" id="blue" onclick="color(this)"></div>
+<div class="col-option" style="background:red;" id="red" onclick="color(this)"></div>
+<div class="col-option" style="background:yellow;" id="yellow" onclick="color(this)"></div>
+<div class="col-option" style="background:orange;" id="orange" onclick="color(this)"></div>
+<div class="col-option" style="background:black;" id="black" onclick="color(this)"></div>
+<div class="col-option" style="background:white; border:2px solid;" id="white" onclick="color(this)"></div>
+
+<!-- path draw controls -->
+<img id="canvasimg" style="display: none;">
+<input type="button" value="Clear" id="clr" size="23" (click)="erase()">
 
 <div style="text-align:center">
   <h3>General path-following movement AI, by Tika.</h3>

@@ -5,7 +5,13 @@ div.full-width {
 }
 
 canvas {
-  width: 40%;
-  margin: 2em auto 2em auto;
   border: 1px solid gray;
+}
+
+div.col-option {
+  position: relative; 
+  z-index: 10; 
+  width: 30px;
+  height: 30px;
+  margin: 0.5em; 
 }
