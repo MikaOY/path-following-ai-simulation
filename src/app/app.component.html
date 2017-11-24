@@ -16,12 +16,12 @@
       <form>
         <h3>Train model</h3>
         <div class="form-group">
-          <label for="exampleInputEmail1">Move X</label>
+          <label>Move X</label>
           <input type="number" class="form-control" placeholder="revolutions">
         </div>
         <div class="form-group">
-          <label for="exampleInputEmail1">Move y</label>
-          <input (value)="yCmd" type="number" class="form-control" placeholder="revolutions">
+          <label>Move y</label>
+          <input [value]="yCmd" type="number" class="form-control" placeholder="revolutions">
         </div>
       </form>
       <button class="btn btn-primary" (click)="train()">Execute</button>      
