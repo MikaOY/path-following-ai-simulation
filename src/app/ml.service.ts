@@ -6,6 +6,8 @@ export class MlService {
 
   constructor() { }
 
+  private wheelRadius: number = (1 / (Math.PI * 2)); // ~0.16 meters
+
   /** train ML model with user-given commands */
   train() {
     var cmd = this.getCmdInput();
