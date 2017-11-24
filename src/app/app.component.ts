@@ -19,6 +19,8 @@ export class AppComponent implements OnInit {
   canvasWidth: number;
   canvasHeight: number;
 
+  pointsArray: any[] = []; 
+
   ngOnInit() {
     this.canvas = document.getElementById('mah-canvas') as HTMLCanvasElement;
 
@@ -53,27 +55,32 @@ export class AppComponent implements OnInit {
       this.canvas.addEventListener("mouseout", (e) => {
         this.findxy('out', e)
       }, false);
+
+      this.ctx.beginPath();
     }
   }
 
   draw() {
-    //if (Math.sqrt((this.prevX - this.currX) ^ 2 + (this.prevY - this.currY) ^ 2) > 3) {
-      this.ctx.beginPath();
-      this.ctx.moveTo(this.prevX, this.prevY);
-      this.ctx.lineTo(this.currX, this.currY);
-      this.ctx.strokeStyle = "black";
-      this.ctx.lineWidth = this.y;
-      this.ctx.stroke();
-      this.ctx.closePath();
-    //}
+    this.ctx.moveTo(this.prevX, this.prevY);
+    this.ctx.lineTo(this.currX, this.currY);
+    this.ctx.strokeStyle = "black";
+    this.ctx.lineWidth = this.y;
+    this.ctx.stroke();
+    this.pointsArray.push({ x: this.prevX, y: this.prevY }); 
   }
 
   erase() {
     var m = confirm("Are you sure you want to clear this path?");
     if (m) {
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      document.getElementById("canvasimg").style.display = "none";
     }
+  }
+
+  logPoints() {
+    console.log('Points array has length ' + this.pointsArray.length); 
+    this.pointsArray.forEach(pt => {
+      console.log(pt.x + '  ' + pt.y); 
+    });
   }
 
   findxy(res, e) {
