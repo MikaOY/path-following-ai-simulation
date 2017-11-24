@@ -19,7 +19,8 @@ export class AppComponent implements OnInit {
   canvasWidth: number;
   canvasHeight: number;
 
-  pointsArray: any[] = []; 
+  pointsArray: any[] = [];
+  cleanPointsArray: any[] = [];
 
   ngOnInit() {
     this.canvas = document.getElementById('mah-canvas') as HTMLCanvasElement;
@@ -55,9 +56,10 @@ export class AppComponent implements OnInit {
       this.canvas.addEventListener("mouseout", (e) => {
         this.findxy('out', e)
       }, false);
-
-      this.ctx.beginPath();
     }
+
+    // path doesn't close until log points called
+    this.ctx.beginPath();
   }
 
   draw() {
@@ -66,20 +68,49 @@ export class AppComponent implements OnInit {
     this.ctx.strokeStyle = "black";
     this.ctx.lineWidth = this.y;
     this.ctx.stroke();
-    this.pointsArray.push({ x: this.prevX, y: this.prevY }); 
+
+    this.pointsArray.push({ x: this.prevX, y: this.prevY });
   }
 
   erase() {
     var m = confirm("Are you sure you want to clear this path?");
     if (m) {
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+      this.pointsArray = [];
+      this.cleanPointsArray = [];
     }
   }
 
   logPoints() {
-    console.log('Points array has length ' + this.pointsArray.length); 
-    this.pointsArray.forEach(pt => {
-      console.log(pt.x + '  ' + pt.y); 
+    this.ctx.closePath();
+
+    // select only certain points that are far away enough from each other
+    for (let index = 0; index < this.pointsArray.length; index++) {
+      let messyPoint = this.pointsArray[index];
+
+      // only add clean point if far enough away from previous
+      if (index == 0) {
+        this.cleanPointsArray.push(messyPoint);
+      }
+      else {
+        let latestCleanPoint = this.cleanPointsArray[this.cleanPointsArray.length - 1];
+        let dist = Math.sqrt(((latestCleanPoint.x - messyPoint.x) ** 2 + (latestCleanPoint.y - messyPoint.y) ** 2));
+        
+        if (dist > 30) {
+          this.cleanPointsArray.push(messyPoint);
+        }
+      }
+    }
+
+    console.log('Points array has length ' + this.pointsArray.length);
+    console.log('Cleaned points array has length ' + this.cleanPointsArray.length);
+
+    this.cleanPointsArray.forEach(pt => {
+      // draw circle at point
+      this.ctx.beginPath();
+      this.ctx.arc(pt.x, pt.y, 5, 0, 2 * Math.PI);
+      this.ctx.fillStyle = 'orange';
+      this.ctx.fill();
     });
   }
 
