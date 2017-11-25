@@ -7,6 +7,7 @@ export class MlService {
   constructor() { }
 
   private wheelRadius: number = (1 / (Math.PI * 2)); // ~0.16 meters
+  public botWidth: number = 50 // width between wheels in px
 
   /** train ML model with user-given commands */
   train(leftCmd, rightCmd, pos, newPos) {

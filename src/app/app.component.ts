@@ -11,6 +11,7 @@ import { MlService } from './ml.service';
 export class AppComponent implements OnInit {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
+  bot: any;
   // drawing path //
   flag = false;
   prevX = 0;
@@ -53,6 +54,13 @@ export class AppComponent implements OnInit {
 
       this.canvasWidth = this.canvas.width;
       this.canvasHeight = this.canvas.height;
+
+      // let img = new Image();
+      // img.src = '../assets/robot50.jpg';
+      // this.ctx.drawImage(img, 50, 50);
+
+      // robot
+      this.bot = this.ctx.fillRect(10,440,50,50);
 
       this.canvas.addEventListener("mousemove", (e) => {
         this.findxy('move', e)
@@ -186,8 +194,34 @@ export class AppComponent implements OnInit {
   /** draws the path each bot part will move */
   drawTravelPath(leftSpeed: number, rightSpeed: number, bodySpeed: number) {
     // calculate arc/ path of left wheel, right wheel, and body based on speeds given
+    let isCounterClock: boolean;
+    let x, y, r, eAngle: number;
+    let sAngle: number = 0;
+    if (leftSpeed > rightSpeed) {
+      isCounterClock = false; // travel clockwise
+      r = this.getRadius(leftSpeed, rightSpeed);
+
+
+    } else if (leftSpeed < rightSpeed) {
+      isCounterClock = true; // travel counterclock
+
+    } else {
+      // travel in straight line
+
+    }
+    this.ctx.arc(x,y,r,sAngle,eAngle,isCounterClock);
     // store arcs/ paths above as class properties
     // draw arcs of travel for left, right wheel, and body
+  }
+
+  getRadius(leftSpeed: number, rightSpeed: number) {
+    let bigSpeed, smallSpeed, r: number;
+    bigSpeed = leftSpeed > rightSpeed ? leftSpeed : rightSpeed;
+    smallSpeed = leftSpeed > rightSpeed ? rightSpeed : leftSpeed;
+
+    r = this.mlService.botWidth / (bigSpeed/smallSpeed - 1);
+    r += this.mlService.botWidth / 2;
+    return r;
   }
 
   /** calculate speed of body given speed of left and right wheel */
