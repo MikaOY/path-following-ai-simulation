@@ -6,6 +6,7 @@ export class MlService {
 
   // simulated constants
   private wheelRadius: number = (1 / (Math.PI * 2)); // ~0.16 meters
+  public botWidth: number = 50 // width between wheels in px
 
   private ml = require('ml-regression');
   private SLR = this.ml.SLR; // Simple Linear Regression
