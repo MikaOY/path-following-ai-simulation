@@ -23,8 +23,8 @@ export class AppComponent implements OnInit {
   canvasWidth: number;
   canvasHeight: number;
   // training //
-  xCmd: number; 
-  yCmd: number; 
+  xCmd: number;
+  yCmd: number;
   // working //
   pointsArray: any[] = [];
   cleanPointsArray: any[] = [];
@@ -60,7 +60,7 @@ export class AppComponent implements OnInit {
       // this.ctx.drawImage(img, 50, 50);
 
       // robot
-      this.bot = this.ctx.fillRect(250,250,50,50);
+      this.bot = this.ctx.fillRect(250, 250, 50, 50);
 
       this.canvas.addEventListener("mousemove", (e) => {
         this.findxy('move', e)
@@ -169,13 +169,13 @@ export class AppComponent implements OnInit {
 
   /** train ML movement model by plotting command and position change after execution as data point */
   train() {
-    console.log('Training ML model'); 
+    console.log('Training ML model');
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    let oldPos = this.getBotPos(); 
-    this.moveBot(this.xCmd, this.yCmd); 
-    let newPos = this.getBotPos(); 
-    
-    this.mlService.train(this.xCmd, this.yCmd, oldPos, newPos);  
+    let oldPos = this.getBotPos();
+    this.moveBot(this.xCmd, this.yCmd);
+    let newPos = this.getBotPos();
+
+    //this.mlService.train(this.xCmd, this.yCmd, oldPos, newPos);  
   }
 
   /** get bot's current Cartesian position */
@@ -188,13 +188,14 @@ export class AppComponent implements OnInit {
    * @param {number} - right wheel speed
    */
   moveBot(leftSpd, rightSpd) {
-    this.drawTravelPath(leftSpd, rightSpd, this.calculateBodySpeed(leftSpd, rightSpd));
-    this.animateObjectsAlongPath(); 
+    this.drawTravelPath(leftSpd, rightSpd);
+    this.animateObjectsAlongPath();
   }
 
   /** draws the path each bot part will move */
-  drawTravelPath(leftSpeed: number, rightSpeed: number, bodySpeed: number) {
+  drawTravelPath(leftSpeed: number, rightSpeed: number) {
     console.log('Left speed = ' + leftSpeed + ', rightSpeed = ' + rightSpeed);
+
     // calculate arc/ path of left wheel, right wheel, and body based on speeds given
     let isCounterClock: boolean;
     let x, y, r, eAngle, xC, yC, slope, arciLength: number;
@@ -214,12 +215,13 @@ export class AppComponent implements OnInit {
       // travel in straight line
     }
     console.log('radius of center arc = ' + r + ', isCounterClock = ' + isCounterClock);
+    // TODO: not necessarily subtracted?
     let ri = r - (this.mlService.botWidth / 2); // inner radius
     // slope = (this.y2 - this.y1) / (this.x2 - this.x1);
     slope = 0;
 
     // change to the center of circle/arc
-    //xC = Math.sqrt((Math.pow(ri, 2) - Math.pow(slope, 2))/2);
+    // xC = Math.sqrt((Math.pow(ri, 2) - Math.pow(slope, 2))/2);
     xC = isCounterClock ? ri : -ri;
     yC = slope * xC;
 
@@ -237,44 +239,38 @@ export class AppComponent implements OnInit {
 
     let arcCLength = r * (Math.PI / eAngle);
     this.findChange(startX, startY, x, y, arcCLength, isCounterClock);
-    
-    this.ctx.arc(x,y,r,sAngle,eAngle,isCounterClock);
-    this.ctx.stroke();
 
+    this.ctx.arc(x, y, r, sAngle, eAngle, isCounterClock);
+    this.ctx.stroke();
+  }
+
+  /** returns radius to CENTER between wheels */
+  getRadius(leftSpeed: number, rightSpeed: number) {
+    let bigSpeed, smallSpeed, r: number;
+    bigSpeed = leftSpeed > rightSpeed ? leftSpeed : rightSpeed;
+    smallSpeed = leftSpeed > rightSpeed ? rightSpeed : leftSpeed;
+
+    r = this.mlService.botWidth / (bigSpeed / smallSpeed - 1);
+    r += this.mlService.botWidth / 2;
+    return r;
   }
 
   findChange(startX, startY, Cx, Cy, length, isCounterClock): number[] {
     let r = Math.sqrt(Math.pow(startX - Cx, 2) + Math.pow(startY - Cy, 2));
     let angle = Math.atan2(startY - Cy, startX - Cx);
     if (!isCounterClock) {
-        angle = angle - length / r;
+      angle = angle - length / r;
     }
     else {
-        angle = angle + length / r;
+      angle = angle + length / r;
     }
     let endX = Cx + r * Math.cos(angle);
     let endY = Cy + r * Math.sin(angle);
-    
+
     let xChange = endX - startX;
     let yChange = endY - startY;
     console.log('xChange = ' + xChange + ', yChange = ' + yChange);
     return [xChange, yChange];
-  }
-
-  // returns radius to CENTER between wheels
-  getRadius(leftSpeed: number, rightSpeed: number) {
-    let bigSpeed, smallSpeed, r: number;
-    bigSpeed = leftSpeed > rightSpeed ? leftSpeed : rightSpeed;
-    smallSpeed = leftSpeed > rightSpeed ? rightSpeed : leftSpeed;
-
-    r = this.mlService.botWidth / (bigSpeed/smallSpeed - 1);
-    r += this.mlService.botWidth / 2;
-    return r;
-  }
-
-  /** calculate speed of body given speed of left and right wheel */
-  calculateBodySpeed(leftSpd: number, rightSpd: number): number {
-    return Math.PI; // factory data 
   }
 
   /** animates all provided objects along provided path, starting and ending at the same time */

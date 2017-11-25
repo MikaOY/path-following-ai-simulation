@@ -7,7 +7,7 @@ export class MlService {
   // simulated constants
   public wheelRadius: number = (50 / Math.PI); // ~1.6, circumference 10
   public botWidth: number = 50 // width between wheels in px
-  public timeUnit: number = 1 // number of seconds sim
+  public timeUnit: number = 1 // number of seconds wheel rotation takes to complete 
 
   // service properties
  // private ml = require('ml-regression');
