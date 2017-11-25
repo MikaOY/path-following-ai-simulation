@@ -60,7 +60,7 @@ export class AppComponent implements OnInit {
       // this.ctx.drawImage(img, 50, 50);
 
       // robot
-      this.bot = this.ctx.fillRect(10,440,50,50);
+      this.bot = this.ctx.fillRect(250,250,50,50);
 
       this.canvas.addEventListener("mousemove", (e) => {
         this.findxy('move', e)
@@ -214,12 +214,13 @@ export class AppComponent implements OnInit {
       // travel in straight line
     }
     console.log('radius of center arc = ' + r + ', isCounterClock = ' + isCounterClock);
-    let ri = r - (this.mlService.botWidth / 2);
+    let ri = r - (this.mlService.botWidth / 2); // inner radius
     // slope = (this.y2 - this.y1) / (this.x2 - this.x1);
     slope = 0;
 
     // change to the center of circle/arc
-    xC = Math.sqrt((ri^2 - slope^2)/2);
+    //xC = Math.sqrt((Math.pow(ri, 2) - Math.pow(slope, 2))/2);
+    xC = isCounterClock ? ri : -ri;
     yC = slope * xC;
 
     // actual x and y center coordinates
@@ -228,7 +229,8 @@ export class AppComponent implements OnInit {
     console.log('actual center coordinates: (' + x + ', ' + y + ')');
 
     
-    eAngle = arciLength / ri * (180 / Math.PI) // calc angle and convert to radians
+    eAngle = arciLength / ri // calc angle in radians
+    console.log('end angle = ' + eAngle + ' radians');
 
     let startX = x + r; // doesn't account for non-straight bots
     let startY = y; // always 0 for now
