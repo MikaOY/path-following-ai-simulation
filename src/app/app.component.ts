@@ -11,6 +11,7 @@ import { MlService } from './ml.service';
 export class AppComponent implements OnInit {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
+  // drawing path //
   flag = false;
   prevX = 0;
   currX = 0;
@@ -20,20 +21,20 @@ export class AppComponent implements OnInit {
   y = 2;
   canvasWidth: number;
   canvasHeight: number;
-
+  // training //
   xCmd: number; 
   yCmd: number; 
-
+  // working //
   pointsArray: any[] = [];
   cleanPointsArray: any[] = [];
 
   constructor(private mlService: MlService) { }
 
   ngOnInit() {
-    // path-drawing //
+
+    /* path-drawing */
 
     this.canvas = document.getElementById('mah-canvas') as HTMLCanvasElement;
-
     if (this.canvas.getContext) {
       this.ctx = this.canvas.getContext('2d');
 
@@ -67,9 +68,11 @@ export class AppComponent implements OnInit {
       }, false);
     }
 
-    // path doesn't close until log points called
+    // path doesn't close until logPoints() called
     this.ctx.beginPath();
   }
+
+  /* path-drawing */
 
   findxy(res, e) {
     if (res == 'down') {
@@ -154,8 +157,46 @@ export class AppComponent implements OnInit {
     });
   }
 
+  /* training */
+
+  /** train ML movement model by plotting command and position change after execution as data point */
   train() {
-    console.log(this.xCmd); 
-    console.log(this.yCmd); 
+    console.log('Training ML model'); 
+
+    let oldPos = this.getBotPos(); 
+    this.moveBot(this.xCmd, this.yCmd); 
+    let newPos = this.getBotPos(); 
+    this.mlService.train(this.xCmd, this.yCmd, oldPos, newPos);  
+  }
+
+  /** get bot's current Cartesian position */
+  getBotPos() {
+    // get coordinates of body center
+  }
+
+  /** move + animate both wheels of bot
+   * @param {number} - left wheel speed
+   * @param {number} - right wheel speed
+   */
+  moveBot(leftSpd, rightSpd) {
+    this.drawTravelPath(leftSpd, rightSpd, this.calculateBodySpeed(leftSpd, rightSpd));
+    this.animateObjectsAlongPath(); 
+  }
+
+  /** draws the path each bot part will move */
+  drawTravelPath(leftSpeed: number, rightSpeed: number, bodySpeed: number) {
+    // calculate arc/ path of left wheel, right wheel, and body based on speeds given
+    // store arcs/ paths above as class properties
+    // draw arcs of travel for left, right wheel, and body
+  }
+
+  /** calculate speed of body given speed of left and right wheel */
+  calculateBodySpeed(leftSpd: number, rightSpd: number): number {
+    return Math.PI; // factory data 
+  }
+
+  /** animates all provided objects along provided path, starting and ending at the same time */
+  animateObjectsAlongPath() {
+    // get path (stored as properties) and animate left wheel, right wheel, and body along them
   }
 }

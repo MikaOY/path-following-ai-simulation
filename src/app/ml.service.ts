@@ -9,24 +9,14 @@ export class MlService {
   private wheelRadius: number = (1 / (Math.PI * 2)); // ~0.16 meters
 
   /** train ML model with user-given commands */
-  train() {
-    var cmd = this.getCmdInput();
-    var pos = this.getPos();
-    this.execCmd(cmd);
-    var newPos = this.getPos();
-
+  train(leftCmd, rightCmd, pos, newPos) {
     var posChange = this.getPosChange(pos, newPos);
-    this.record(cmd, posChange.x, posChange.y);
+    this.record(leftCmd, rightCmd, posChange.x, posChange.y);
   }
 
   /** get command as input from user */
   getCmdInput() {
     // get user input for random command 
-  }
-
-  /** get bot's current Cartesian position */
-  getPos() {
-    // get bot absolute position
   }
 
   /** execute given command */
@@ -35,8 +25,8 @@ export class MlService {
   }
 
   /** record command and result of executing it as ML training data */
-  record(cmd, bearingChange, rChange) {
-    // plot cmd, bearing change, pos change as one point in ML training data
+  record(leftCmd, rightCmd, xChange, yChange) {
+    // plot left + right command, pos change X + Y as one point in ML training data
   }
 
   /** 
@@ -66,7 +56,7 @@ export class MlService {
    * @param {{x, y}} point - absolute (x, r) point
    */
   move(point) {
-    var moveDistance = this.getPosChange(this.getPos(), point);
+    //var moveDistance = this.getPosChange(this.getPos(), point);
     // query ML for extrapolated command
     // move bot to point, animated, with delay to show movement
   }

@@ -17,11 +17,11 @@
         <h3>Train model</h3>
         <div class="form-group">
           <label>Move X</label>
-          <input [(ngModel)]="xCmd" type="number" name="x" class="form-control" placeholder="revolutions">
+          <input [(ngModel)]="xCmd" type="number" name="x" class="form-control" placeholder="revolutions/s">
         </div>
         <div class="form-group">
           <label>Move y</label>
-          <input [(ngModel)]="yCmd" type="number" name="y" class="form-control" placeholder="revolutions">
+          <input [(ngModel)]="yCmd" type="number" name="y" class="form-control" placeholder="revolutions/s">
         </div>
       </form>
       <button class="btn btn-primary" (click)="train()">Execute</button>      
