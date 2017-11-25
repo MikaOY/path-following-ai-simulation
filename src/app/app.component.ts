@@ -170,7 +170,7 @@ export class AppComponent implements OnInit {
   /** train ML movement model by plotting command and position change after execution as data point */
   train() {
     console.log('Training ML model'); 
-
+    this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     let oldPos = this.getBotPos(); 
     this.moveBot(this.xCmd, this.yCmd); 
     let newPos = this.getBotPos(); 
@@ -194,23 +194,26 @@ export class AppComponent implements OnInit {
 
   /** draws the path each bot part will move */
   drawTravelPath(leftSpeed: number, rightSpeed: number, bodySpeed: number) {
+    console.log('Left speed = ' + leftSpeed + ', rightSpeed = ' + rightSpeed);
     // calculate arc/ path of left wheel, right wheel, and body based on speeds given
     let isCounterClock: boolean;
-    let x, y, r, eAngle, xC, yC, slope: number;
+    let x, y, r, eAngle, xC, yC, slope, arciLength: number;
     let sAngle: number = 0;
+    let x2: number = 250; // pos of right bottom of rect (inner arc)
+    let y2: number = 250; // pos of right bottom of rect (inner arc)
+
     if (leftSpeed > rightSpeed) {
       isCounterClock = false; // travel clockwise
       r = this.getRadius(leftSpeed, rightSpeed);
-
+      arciLength = rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else if (leftSpeed < rightSpeed) {
       isCounterClock = true; // travel counterclock
       r = this.getRadius(leftSpeed, rightSpeed);
-
+      arciLength = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else {
       // travel in straight line
-
     }
-
+    console.log('radius of center arc = ' + r + ', isCounterClock = ' + isCounterClock);
     let ri = r - (this.mlService.botWidth / 2);
     // slope = (this.y2 - this.y1) / (this.x2 - this.x1);
     slope = 0;
@@ -220,21 +223,22 @@ export class AppComponent implements OnInit {
     yC = slope * xC;
 
     // actual x and y center coordinates
-    x = xC; // TODO: + x2
-    y = yC; // TODO: + y2 (always 0 for now)
+    x = xC + x2; // TODO: + x2
+    y = yC + y2; // TODO: + y2 (always 0 for now)
+    console.log('actual center coordinates: (' + x + ', ' + y + ')');
 
-    let arciLength = rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
+    
     eAngle = arciLength / ri * (180 / Math.PI) // calc angle and convert to radians
 
     let startX = x + r; // doesn't account for non-straight bots
     let startY = y; // always 0 for now
+
     let arcCLength = r * (Math.PI / eAngle);
     this.findChange(startX, startY, x, y, arcCLength, isCounterClock);
 
     this.ctx.arc(x,y,r,sAngle,eAngle,isCounterClock);
     this.ctx.stroke();
-    // store arcs/ paths above as class properties
-    // draw arcs of travel for left, right wheel, and body
+
   }
 
   findChange(startX, startY, Cx, Cy, length, isCounterClock): number[] {
@@ -251,6 +255,7 @@ export class AppComponent implements OnInit {
     
     let xChange = endX - startX;
     let yChange = endY - startY;
+    console.log('xChange = ' + xChange + ', yChange = ' + yChange);
     return [xChange, yChange];
   }
 

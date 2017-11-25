@@ -10,8 +10,8 @@ export class MlService {
   public timeUnit: number = 1 // number of seconds sim
 
   // service properties
-  private ml = require('ml-regression');
-  private SLR = this.ml.SLR; // Simple Linear Regression
+ // private ml = require('ml-regression');
+ // private SLR = this.ml.SLR; // Simple Linear Regression
   private regressionModel; 
   private inputPositionChanges: number[][] = []; 
   private outputCommands: number[][] = []; 
@@ -24,7 +24,7 @@ export class MlService {
     this.record(leftCmd, rightCmd, posChange.x, posChange.y);
 
     // train the model on training data
-    this.regressionModel = new this.SLR(this.inputPositionChanges, this.outputCommands); 
+   // this.regressionModel = new this.SLR(this.inputPositionChanges, this.outputCommands); 
     console.log(this.regressionModel.toString(3));
   }
 
