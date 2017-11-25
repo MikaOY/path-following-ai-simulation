@@ -225,19 +225,19 @@ export class AppComponent implements OnInit {
 
     // actual x and y center coordinates
     x = xC + x2; // TODO: + x2
-    y = yC + y2; // TODO: + y2 (always 0 for now)
+    y = yC + y2; // TODO: + y2 (always y2 for now)
     console.log('actual center coordinates: (' + x + ', ' + y + ')');
 
-    
+    sAngle = isCounterClock ? Math.PI : 0;
     eAngle = arciLength / ri // calc angle in radians
     console.log('end angle = ' + eAngle + ' radians');
 
-    let startX = x + r; // doesn't account for non-straight bots
-    let startY = y; // always 0 for now
+    let startX = isCounterClock ? x - r : x + r; // doesn't account for non-straight bots
+    let startY = y; // always y2 for now
 
     let arcCLength = r * (Math.PI / eAngle);
     this.findChange(startX, startY, x, y, arcCLength, isCounterClock);
-
+    
     this.ctx.arc(x,y,r,sAngle,eAngle,isCounterClock);
     this.ctx.stroke();
 
