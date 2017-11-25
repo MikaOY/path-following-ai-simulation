@@ -4,14 +4,26 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class MlService {
 
-  constructor() { }
-
+  // simulated constants
   private wheelRadius: number = (1 / (Math.PI * 2)); // ~0.16 meters
+
+  private ml = require('ml-regression');
+  private SLR = this.ml.SLR; // Simple Linear Regression
+  private regressionModel; 
+
+  private inputCommands: number[][] = []; 
+  private outputPositionChanges: number[][] = []; 
+
+  constructor() { }
 
   /** train ML model with user-given commands */
   train(leftCmd, rightCmd, pos, newPos) {
     var posChange = this.getPosChange(pos, newPos);
     this.record(leftCmd, rightCmd, posChange.x, posChange.y);
+
+    // train the model on training data
+    this.regressionModel = new this.SLR(this.inputCommands, this.outputPositionChanges); 
+    console.log(this.regressionModel.toString(3));
   }
 
   /** get command as input from user */
@@ -27,6 +39,8 @@ export class MlService {
   /** record command and result of executing it as ML training data */
   record(leftCmd, rightCmd, xChange, yChange) {
     // plot left + right command, pos change X + Y as one point in ML training data
+    this.inputCommands.push([leftCmd, rightCmd]); 
+    this.outputPositionChanges.push([xChange, yChange]); 
   }
 
   /** 
@@ -35,7 +49,7 @@ export class MlService {
    */
   getPosChange(pos, newPos): { x: number, y: number } {
     // get current position diff from given
-    return { x: 5, y: 5 }; 
+    return { x: 5, y: 5 };
   }
 
   /**
@@ -67,7 +81,7 @@ export class MlService {
    */
   checkBattery(percentage?): boolean {
     // check if below percentage given if not undefined
-    return true; 
+    return true;
   }
 
   /** return to charging station pos */
