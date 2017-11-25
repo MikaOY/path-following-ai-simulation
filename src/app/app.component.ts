@@ -218,17 +218,40 @@ export class AppComponent implements OnInit {
     // change to the center of circle/arc
     xC = Math.sqrt((ri^2 - slope^2)/2);
     yC = slope * xC;
-    // actual x and y
+
+    // actual x and y center coordinates
     x = xC; // TODO: + x2
-    y = yC; // TODO: + y2
+    y = yC; // TODO: + y2 (always 0 for now)
 
     let arciLength = rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     eAngle = arciLength / ri * (180 / Math.PI) // calc angle and convert to radians
+
+    let startX = x + r; // doesn't account for non-straight bots
+    let startY = y; // always 0 for now
+    let arcCLength = r * (Math.PI / eAngle);
+    this.findChange(startX, startY, x, y, arcCLength, isCounterClock);
 
     this.ctx.arc(x,y,r,sAngle,eAngle,isCounterClock);
     this.ctx.stroke();
     // store arcs/ paths above as class properties
     // draw arcs of travel for left, right wheel, and body
+  }
+
+  findChange(startX, startY, Cx, Cy, length, isCounterClock): number[] {
+    let r = Math.sqrt(Math.pow(startX - Cx, 2) + Math.pow(startY - Cy, 2));
+    let angle = Math.atan2(startY - Cy, startX - Cx);
+    if (!isCounterClock) {
+        angle = angle - length / r;
+    }
+    else {
+        angle = angle + length / r;
+    }
+    let endX = Cx + r * Math.cos(angle);
+    let endY = Cy + r * Math.sin(angle);
+    
+    let xChange = endX - startX;
+    let yChange = endY - startY;
+    return [xChange, yChange];
   }
 
   // returns radius to CENTER between wheels
