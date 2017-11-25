@@ -196,25 +196,42 @@ export class AppComponent implements OnInit {
   drawTravelPath(leftSpeed: number, rightSpeed: number, bodySpeed: number) {
     // calculate arc/ path of left wheel, right wheel, and body based on speeds given
     let isCounterClock: boolean;
-    let x, y, r, eAngle: number;
+    let x, y, r, eAngle, xC, yC, slope: number;
     let sAngle: number = 0;
     if (leftSpeed > rightSpeed) {
       isCounterClock = false; // travel clockwise
       r = this.getRadius(leftSpeed, rightSpeed);
 
-
     } else if (leftSpeed < rightSpeed) {
       isCounterClock = true; // travel counterclock
+      r = this.getRadius(leftSpeed, rightSpeed);
 
     } else {
       // travel in straight line
 
     }
+
+    let ri = r - (this.mlService.botWidth / 2);
+    // slope = (this.y2 - this.y1) / (this.x2 - this.x1);
+    slope = 0;
+
+    // change to the center of circle/arc
+    xC = Math.sqrt((ri^2 - slope^2)/2);
+    yC = slope * xC;
+    // actual x and y
+    x = xC; // TODO: + x2
+    y = yC; // TODO: + y2
+
+    let arciLength = rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
+    eAngle = arciLength / ri * (180 / Math.PI) // calc angle and convert to radians
+
     this.ctx.arc(x,y,r,sAngle,eAngle,isCounterClock);
+    this.ctx.stroke();
     // store arcs/ paths above as class properties
     // draw arcs of travel for left, right wheel, and body
   }
 
+  // returns radius to CENTER between wheels
   getRadius(leftSpeed: number, rightSpeed: number) {
     let bigSpeed, smallSpeed, r: number;
     bigSpeed = leftSpeed > rightSpeed ? leftSpeed : rightSpeed;

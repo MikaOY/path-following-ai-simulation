@@ -5,8 +5,9 @@ import { Injectable } from '@angular/core';
 export class MlService {
 
   // simulated constants
-  private wheelRadius: number = (1 / (Math.PI * 2)); // ~0.16 meters
+  public wheelRadius: number = (1 / (Math.PI * 2)); // ~0.16 meters
   public botWidth: number = 50 // width between wheels in px
+  public timeUnit: number = 1 // number of seconds sim
 
   private ml = require('ml-regression');
   private SLR = this.ml.SLR; // Simple Linear Regression
