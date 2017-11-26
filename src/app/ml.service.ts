@@ -15,21 +15,21 @@ export class MlService {
   private inputPositionChanges: number[][] = [];
   private outputCommands: number[][] = [];
 
-  constructor() {
-    // mock only
-    this.inputPositionChanges = [[3, 4], [5, 6], [8, 10], [3, 5]];
-    this.outputCommands = [[2, 5], [4, 5], [6, 7], [2, 4]];
-  }
+  constructor() { }
 
   /** train ML model with user-given commands */
   train(leftCmd, rightCmd, pos, newPos) {
-    // var posChange = this.getPosChange(pos, newPos);
-    // this.record(leftCmd, rightCmd, posChange.x, posChange.y);
+    let translation: number[] = this.getPosChange(leftCmd, rightCmd);
+    if (!(translation && translation[0] && translation[2])) {
+      console.error('Translation calc given commands failed!')
+    } else {
+      this.record(leftCmd, rightCmd, translation[0], translation[1]);
 
-    // train the model on training data
-    this.regressionModel = new MLR(this.inputPositionChanges, this.outputCommands);
-    console.log(this.regressionModel);
-    console.log('Prediction with pos change [12,19] is ' + this.regressionModel.predict([[12, 19]]).toString());
+      // train the model on training data
+      this.regressionModel = new MLR(this.inputPositionChanges, this.outputCommands);
+      console.log(this.regressionModel);
+      console.log('Prediction with pos change [12,19] is ' + this.regressionModel.predict([[12, 19]]).toString());
+    }
   }
 
   /** record command and result of executing it as ML training data */
@@ -39,29 +39,13 @@ export class MlService {
     this.outputCommands.push([xChange, yChange]);
   }
 
-  /** 
-   * get difference between given positions 
-   * @returns {{x, y}} - change in Cartesian coordinates
-   */
-  getPosChange(pos, newPos): { x: number, y: number } {
-    // get current position diff from given
-    return { x: 5, y: 5 };
-  }
-
   /**
-   * attempt to follow path defined by an array of points
-   * @param {{x, y}[]} pointsArray - Array of points that define the path to follow. 
+   * Calculates Cartesian translation of bot given left and right motor speed
+   * @param {number} leftSpeed
+   * @param {number} rightSpeed 
+   * @returns {[x, y]} - change in Cartesian position, given as a 1D array with x and y component of translation
    */
-  predictCommand(xDiff, yDiff) {
-    this.regressionModel.predict([[xDiff, yDiff]]);
-  }
-
-  /**
-   * Calculates path of bot given params
-   * @param leftSpeed 
-   * @param rightSpeed 
-   */
-  getChange(leftSpeed: number, rightSpeed: number) {
+  getPosChange(leftSpeed: number, rightSpeed: number) {
     let isCounterClock: boolean;
     let x, y, r, eAngle, xC, yC, slope, arciLength, currAngle: number;
     let sAngle: number = 0;
