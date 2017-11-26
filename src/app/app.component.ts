@@ -72,11 +72,25 @@ export class AppComponent implements OnInit {
     // path doesn't close until logPoints() called
     this.ctx.beginPath();
 
+    this.drawBot(); 
+  }
+
+  drawBot() {
     // robot
     // let img = new Image();
     // img.src = '../assets/robot50.jpg';
     // this.ctx.drawImage(img, 50, 50);
-    this.bot = this.ctx.fillRect(250, 250, 50, 50);
+    // this.bot = this.ctx.fillRect(250, 250, 50, 50);    
+    this.ctx.strokeStyle = 'black';
+    this.ctx.fillStyle = 'orange';
+    this.ctx.beginPath();
+    this.ctx.moveTo(250, 250);
+    this.ctx.lineTo(300, 250);
+    this.ctx.lineTo(260, 220);
+    this.ctx.moveTo(290, 220);
+    this.ctx.lineTo(260, 220);
+    this.ctx.lineTo(300, 250);
+    this.ctx.fill();
   }
 
   /* path-drawing */
@@ -131,9 +145,7 @@ export class AppComponent implements OnInit {
     }
 
     // redraw bot
-    this.ctx.strokeStyle = 'black';
-    this.ctx.fillStyle = 'black';
-    this.bot = this.ctx.fillRect(250, 250, 50, 50);
+    this.drawBot();
   }
 
   logPoints() {
