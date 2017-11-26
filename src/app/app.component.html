@@ -1,6 +1,6 @@
-<div class="container">
+<div class="container-fluid">
   <div class="row">
-    <div>
+    <div class="canvas-stuff">
       <canvas id="mah-canvas" width="600" height="500"></canvas>
       <div class="full-width">
         <!-- path draw controls -->
@@ -10,29 +10,32 @@
         </div>
       </div>
     </div>
-    <div class="col-md-8">
+    <div class="col-lg-8">
 
     </div>
 
-    <div class="col-md-4 canvas-side">
+    <div class="col-lg-4 canvas-side">
       <!-- command inputs to train movement -->
-      <form>
-        <h3>Train model</h3>
-        <div class="form-group">
-          <label>Left wheel speed</label>
-          <input [(ngModel)]="xCmd" type="number" name="x" class="form-control" placeholder="revolutions/s">
-        </div>
-        <div class="form-group">
-          <label>Right wheel speed</label>
-          <input [(ngModel)]="yCmd" type="number" name="y" class="form-control" placeholder="revolutions/s">
-        </div>
-      </form>
-      <button class="btn btn-primary" (click)="train()">Execute</button>
+      <div class="options">
+        <form>
+          <h3>Train model</h3>
+          <div class="form-group">
+            <label>Left wheel speed</label>
+            <input [(ngModel)]="xCmd" type="number" name="x" class="form-control" placeholder="revolutions/s">
+          </div>
+          <div class="form-group">
+            <label>Right wheel speed</label>
+            <input [(ngModel)]="yCmd" type="number" name="y" class="form-control" placeholder="revolutions/s">
+          </div>
+        </form>
+        <button class="btn btn-primary" (click)="train()">Execute</button>
+      </div>
     </div>
   </div>
 </div>
 
 <div style="text-align:center">
-  <h4 style="margin-bottom: 1em;">General path-following movement AI, by Tika.</h4>
+  <hr>
+  <h4 style="margin: 1em">General path-following movement AI, by Tika.</h4>
   <img style="margin-bottom: 2em;" width="10%" src="../assets/tika-text.svg">
 </div>

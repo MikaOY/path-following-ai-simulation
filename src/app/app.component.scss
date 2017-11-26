@@ -1,7 +1,6 @@
 
-div.full-width {
-  width: 100%;
-  text-align: center;
+div.canvas-stuff {
+  margin: auto; 
 }
 
 canvas {
@@ -9,16 +8,22 @@ canvas {
   border: 1px solid gray;
 }
 
+div.full-width {
+  width: 100%;
+  text-align: center;
+}
+
 button.canvas-btn {
-  margin: 0 auto 2em auto;   
+  margin: 0 auto 1em auto;   
 }
 
 div.canvas-side {
-  @media (min-width: 767px) { 
+  @media (min-width: 991px) { 
     margin-top: -37em; 
   }
 }
 
-form {
-  margin-top: 2em;  
+div.options {
+  width: 60%; 
+  margin: 2em auto;  
 }

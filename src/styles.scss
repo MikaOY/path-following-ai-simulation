@@ -6,32 +6,17 @@
 
 // Extra small devices (portrait phones, less than 576px)
 @media (max-width: 575px) { 
-  h1.responsive {
-    font-size: 5vw !important; 
-  }
-  p.responsive {
-    font-size: 3vw !important;  
-  }
+
 }
 
 // Small devices (landscape phones, less than 768px)
 @media (max-width: 767px) { 
-  h1.responsive {
-    font-size: 5vw !important; 
-  }
-  p.responsive {
-    font-size: 3vw !important;  
-  }
+
 }
 
 // Medium devices (tablets, less than 992px)
 @media (max-width: 991px) { 
-  h1.responsive {
-    font-size: 3.5vw; 
-  }
-  p.responsive {
-    font-size: 2vw; 
-  }
+
 }
 
 // Large devices (desktops, less than 1200px)
