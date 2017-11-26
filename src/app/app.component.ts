@@ -22,6 +22,7 @@ export class AppComponent implements OnInit {
   y = 2;
   canvasWidth: number;
   canvasHeight: number;
+  currAngle: number = 0;
   // training //
   xCmd: number;
   yCmd: number;
@@ -205,7 +206,7 @@ export class AppComponent implements OnInit {
    */
   moveBot(leftSpd, rightSpd) {
     this.drawTravelPath(leftSpd, rightSpd);
-    this.animateBotAlongPath();
+    
   }
 
   /** draws the path each bot part will move 
@@ -308,8 +309,28 @@ export class AppComponent implements OnInit {
   }
 
   /** animates all provided objects along provided path, starting and ending at the same time */
-  animateObjectsAlongPath(x, y, r, sAngle, eAngle, isCounterClock) {
+  animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock) {
     // get path (stored as properties) and animate left wheel, right wheel, and body along them
-    
+    // Clear off the canvas
+    this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    // Start over
+    this.ctx.beginPath();
+    // Re-draw from the very beginning each time so there isn't tiny line spaces between each section (the browser paint rendering will probably be smoother too)
+    this.ctx.arc(x, y, r, sAngle, sAngle + this.currAngle, false);
+    // Draw
+    this.ctx.stroke();
+    // Increment percent
+    if (isCounterClock) {
+      this.currAngle -= 0.1;
+    } else {
+      this.currAngle += 0.1;
+    }
+    // Animate until end
+    if (this.currAngle < eAngle + 1) {
+      // Recursive repeat this function until the end is reached
+      requestAnimationFrame(function () {
+        this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
+      });
+    }
   }
 }
