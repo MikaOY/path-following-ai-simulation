@@ -217,21 +217,21 @@ export class AppComponent implements OnInit {
     console.log('radius of center arc = ' + r + ', isCounterClock = ' + isCounterClock);
     let ri = r - (this.mlService.botWidth / 2); // inner radius
     // slope = (this.y2 - this.y1) / (this.x2 - this.x1);
-    slope = 0;
+    slope = 0; // bot is not angled
 
     // change to the center of circle/arc
     //xC = Math.sqrt((Math.pow(ri, 2) - Math.pow(slope, 2))/2);
-    xC = isCounterClock ? ri : -ri;
-    yC = slope * xC;
+    xC = isCounterClock ? ri : -ri; // only for straight bots
+    yC = slope * xC; // always 0 for now
 
     // actual x and y center coordinates
-    x = xC + x2; // TODO: + x2
-    y = yC + y2; // TODO: + y2 (always y2 for now)
+    x = xC + x2; 
+    y = yC + y2; 
     console.log('actual center coordinates: (' + x + ', ' + y + ')');
 
-    sAngle = isCounterClock ? Math.PI : 0;
+    sAngle = isCounterClock ? Math.PI : 0; // start angle in rad
     console.log('arcilength = ' + arciLength + ', ri = ' + ri);
-    eAngle = arciLength / ri // calc angle in radians
+    eAngle = isCounterClock ? Math.PI - (arciLength / ri) : (arciLength / ri); // calc end angle in radians
     console.log('end angle = ' + eAngle + ' radians');
     
     // clears canvas and draws path
@@ -242,7 +242,7 @@ export class AppComponent implements OnInit {
     // find change in x and y from center of bot
     // start pos of bot center
     let startX = isCounterClock ? x - r : x + r; // doesn't account for non-straight bots
-    let startY = y; // always y2 for now
+    let startY = y; // always same as circle center for now
 
     // angle from origin
     let angle = Math.atan2(startY - y, startX - x);
@@ -256,11 +256,11 @@ export class AppComponent implements OnInit {
     }
     console.log('angle from origin = ' + angle);
     // end position coordinates
-    let endX = x + r * Math.cos(eAngle);
-    let endY = y + r * Math.sin(eAngle);
+    let endX = x + r * Math.cos(angle);
+    let endY = y + r * Math.sin(angle);
     
     let xChange = endX - startX;
-    let yChange = endY - startY;
+    let yChange = (endY - startY); // negate for weird canvas system
     console.log('xChange = ' + xChange + ', yChange = ' + yChange);
     return [xChange, yChange];
   }
