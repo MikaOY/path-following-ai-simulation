@@ -208,13 +208,17 @@ export class AppComponent implements OnInit {
     this.animateBotAlongPath();
   }
 
-  /** draws the path each bot part will move */
+  /** draws the path each bot part will move 
+   * @param {number} - number of revolutions left wheel turns in given time
+   * @param {number} - number of revolutions left wheel turns in given time
+   * @returns {{x,y}} - change in x and y distance
+  */
   drawTravelPath(leftSpeed: number, rightSpeed: number) {
     console.log('Left speed = ' + leftSpeed + ', rightSpeed = ' + rightSpeed);
 
     // calculate arc/ path of left wheel, right wheel, and body based on speeds given
     let isCounterClock: boolean;
-    let x, y, r, eAngle, xC, yC, slope, arciLength: number;
+    let x, y, r, eAngle, xC, yC, slope, arciLength, currAngle: number;
     let sAngle: number = 0;
     let x2: number = 250; // pos of right bottom of rect (inner arc)
     let y2: number = 250; // pos of right bottom of rect (inner arc)
@@ -261,7 +265,7 @@ export class AppComponent implements OnInit {
     eAngle = isCounterClock ? Math.PI - (arciLength / ri) : (arciLength / ri); // calc end angle in radians
     console.log('end angle = ' + eAngle + ' radians');
 
-    // clears canvas and draws path
+    // clears canvas and draws ARC
     this.ctx.beginPath();
     this.ctx.arc(x, y, r, sAngle, eAngle, isCounterClock);
     this.ctx.stroke();
@@ -290,7 +294,9 @@ export class AppComponent implements OnInit {
     return [xChange, yChange];
   }
 
-  // returns radius to CENTER between wheels
+  /** 
+   * returns radius to CENTER between wheels
+   */
   getRadius(leftSpeed: number, rightSpeed: number) {
     let bigSpeed, smallSpeed, r: number;
     bigSpeed = leftSpeed > rightSpeed ? leftSpeed : rightSpeed;
@@ -302,7 +308,8 @@ export class AppComponent implements OnInit {
   }
 
   /** animates all provided objects along provided path, starting and ending at the same time */
-  animateBotAlongPath() {
+  animateObjectsAlongPath(x, y, r, sAngle, eAngle, isCounterClock) {
     // get path (stored as properties) and animate left wheel, right wheel, and body along them
+    
   }
 }
