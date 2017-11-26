@@ -23,6 +23,10 @@ export class MlService {
   /** train ML model with user-given commands */
   train(leftCmd, rightCmd, pos: number[], newPos: number[]) {
     if (!(pos && newPos && leftCmd && rightCmd)) {
+      console.log(pos); 
+      console.log(newPos); 
+      console.log(leftCmd); 
+      console.log(rightCmd); 
       console.error('Not enough defined params to train model!'); 
     } else {
       let diff: number[] = this.calculatePosDifference(pos, newPos); 
