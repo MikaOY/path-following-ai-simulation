@@ -249,24 +249,18 @@ export class AppComponent implements OnInit {
     // start pos of bot center
     let startX = isCounterClock ? x - r : x + r; // doesn't account for non-straight bots
     let startY = y; // always same as circle center for now
-
+    this.ctx.fillRect(startX, startY, 20, 20);
+    this.ctx.fillRect(x, y, 10, 10);
     // angle from origin
-    let angle = Math.atan2(startY - y, startX - x);
-    let arcCLength = r * eAngle;
-
-    if (!isCounterClock) {
-      // just subtract center arc angle (theta = s/r)
-      angle = angle - arcCLength / r;
-    }
-    else {
-      angle = angle + arcCLength / r;
-    }
-    console.log('angle from origin = ' + angle);
+    
+    let angle = isCounterClock ? (2 * Math.PI) - eAngle : eAngle - sAngle;
+    console.log('angle from between origin = ' + angle);
 
     // end position coordinates
-    let endX = x + r * Math.cos(angle);
-    let endY = y + r * Math.sin(angle);
+    let endX = x + (r * Math.cos(angle));
+    let endY = isCounterClock ? y - (r * Math.sin(angle)) : y + (r * Math.sin(angle));
     console.log('endX = ' + endX + ', endY = ' + endY);
+    this.ctx.fillRect(endX, endY, 20, 20);
 
     // subtract from start coordinates to get change
     let xChange = endX - startX;
