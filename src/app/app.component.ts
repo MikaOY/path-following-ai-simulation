@@ -226,12 +226,12 @@ export class AppComponent implements OnInit {
 
     if (leftSpeed > rightSpeed) {
       isCounterClock = false; // travel clockwise
-      r = this.getRadius(leftSpeed, rightSpeed);
+      r = this.mlService.getRadius(leftSpeed, rightSpeed);
       // calculate inner arc length, in this case right wheel
       arciLength = rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else if (leftSpeed < rightSpeed) {
       isCounterClock = true; // travel counterclock
-      r = this.getRadius(leftSpeed, rightSpeed);
+      r = this.mlService.getRadius(leftSpeed, rightSpeed);
       arciLength = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else {
       // travel in straight line
@@ -267,9 +267,9 @@ export class AppComponent implements OnInit {
     console.log('end angle = ' + eAngle + ' radians');
 
     // clears canvas and draws ARC
-    this.ctx.beginPath();
+    this.currAngle = 0;
     this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
-    this.ctx.stroke();
+ 
 
     // find change in x and y from center of bot
     // start pos of bot center
@@ -325,7 +325,6 @@ export class AppComponent implements OnInit {
       if (sAngle + this.currAngle > eAngle) {
         // Recursive repeat this function until the end is reached
         window.requestAnimationFrame(() => {
-          console.log('hi');
           this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
         });
       } else {
@@ -337,7 +336,6 @@ export class AppComponent implements OnInit {
         // Recursive repeat this function until the end is reached
         window.requestAnimationFrame(() => {
           this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
-          console.log('hi');
         });
       } else {
         
