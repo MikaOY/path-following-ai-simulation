@@ -205,7 +205,7 @@ export class AppComponent implements OnInit {
    */
   moveBot(leftSpd, rightSpd) {
     this.drawTravelPath(leftSpd, rightSpd);
-    this.animateObjectsAlongPath();
+    this.animateBotAlongPath();
   }
 
   /** draws the path each bot part will move */
@@ -301,13 +301,8 @@ export class AppComponent implements OnInit {
     return r;
   }
 
-  /** calculate speed of body given speed of left and right wheel */
-  calculateBodySpeed(leftSpd: number, rightSpd: number): number {
-    return Math.PI; // factory data 
-  }
-
   /** animates all provided objects along provided path, starting and ending at the same time */
-  animateObjectsAlongPath() {
+  animateBotAlongPath() {
     // get path (stored as properties) and animate left wheel, right wheel, and body along them
   }
 }
