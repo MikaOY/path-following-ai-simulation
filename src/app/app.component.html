@@ -1,8 +1,8 @@
 <div class="container">
   <div class="row">
-    <div class="col-md-8">
+    <div>
+      <canvas id="mah-canvas" width="600" height="500"></canvas>
       <div class="full-width">
-        <canvas id="mah-canvas" width="600" height="500"></canvas>
         <!-- path draw controls -->
         <div style="width:100%;">
           <button type="button" id="clr" class="canvas-btn btn btn-danger" (click)="erase()">Clear path</button>
@@ -10,9 +10,12 @@
         </div>
       </div>
     </div>
+    <div class="col-md-8">
 
-    <div class="col-md-4">
-      <!-- command inputs to train movement --> 
+    </div>
+
+    <div class="col-md-4 canvas-side">
+      <!-- command inputs to train movement -->
       <form>
         <h3>Train model</h3>
         <div class="form-group">
@@ -24,12 +27,12 @@
           <input [(ngModel)]="yCmd" type="number" name="y" class="form-control" placeholder="revolutions/s">
         </div>
       </form>
-      <button class="btn btn-primary" (click)="train()">Execute</button>      
+      <button class="btn btn-primary" (click)="train()">Execute</button>
     </div>
   </div>
 </div>
 
 <div style="text-align:center">
   <h4 style="margin-bottom: 1em;">General path-following movement AI, by Tika.</h4>
-  <img style="margin-bottom: 1em;" width="10%" src="../assets/tika-text.svg">
+  <img style="margin-bottom: 2em;" width="10%" src="../assets/tika-text.svg">
 </div>
