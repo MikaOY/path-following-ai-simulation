@@ -268,7 +268,7 @@ export class AppComponent implements OnInit {
 
     // clears canvas and draws ARC
     this.ctx.beginPath();
-    this.ctx.arc(x, y, r, sAngle, eAngle, isCounterClock);
+    this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
     this.ctx.stroke();
 
     // find change in x and y from center of bot
@@ -316,21 +316,34 @@ export class AppComponent implements OnInit {
     // Start over
     this.ctx.beginPath();
     // Re-draw from the very beginning each time so there isn't tiny line spaces between each section (the browser paint rendering will probably be smoother too)
-    this.ctx.arc(x, y, r, sAngle, sAngle + this.currAngle, false);
+    this.ctx.arc(x, y, r, sAngle, sAngle + this.currAngle, isCounterClock);
     // Draw
     this.ctx.stroke();
     // Increment percent
     if (isCounterClock) {
       this.currAngle -= 0.1;
+      if (sAngle + this.currAngle > eAngle) {
+        // Recursive repeat this function until the end is reached
+        window.requestAnimationFrame(() => {
+          console.log('hi');
+          this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
+        });
+      } else {
+        
+      }
     } else {
       this.currAngle += 0.1;
+      if (sAngle + this.currAngle < eAngle) {
+        // Recursive repeat this function until the end is reached
+        window.requestAnimationFrame(() => {
+          this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
+          console.log('hi');
+        });
+      } else {
+        
+      }
     }
     // Animate until end
-    if (this.currAngle < eAngle + 1) {
-      // Recursive repeat this function until the end is reached
-      requestAnimationFrame(function () {
-        this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
-      });
-    }
+    
   }
 }
