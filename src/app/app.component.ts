@@ -55,13 +55,6 @@ export class AppComponent implements OnInit {
       this.canvasWidth = this.canvas.width;
       this.canvasHeight = this.canvas.height;
 
-      // let img = new Image();
-      // img.src = '../assets/robot50.jpg';
-      // this.ctx.drawImage(img, 50, 50);
-
-      // robot
-      this.bot = this.ctx.fillRect(250, 250, 50, 50);
-
       this.canvas.addEventListener("mousemove", (e) => {
         this.findxy('move', e)
       }, false);
@@ -78,6 +71,12 @@ export class AppComponent implements OnInit {
 
     // path doesn't close until logPoints() called
     this.ctx.beginPath();
+
+    // robot
+    // let img = new Image();
+    // img.src = '../assets/robot50.jpg';
+    // this.ctx.drawImage(img, 50, 50);
+    this.bot = this.ctx.fillRect(250, 250, 50, 50);
   }
 
   /* path-drawing */
@@ -130,6 +129,11 @@ export class AppComponent implements OnInit {
       this.pointsArray = [];
       this.cleanPointsArray = [];
     }
+
+    // redraw bot
+    this.ctx.strokeStyle = 'black';
+    this.ctx.fillStyle = 'black';
+    this.bot = this.ctx.fillRect(250, 250, 50, 50);
   }
 
   logPoints() {
@@ -175,7 +179,7 @@ export class AppComponent implements OnInit {
     this.moveBot(this.xCmd, this.yCmd);
     let newPos = this.getBotPos();
 
-    this.mlService.train(this.xCmd, this.yCmd, oldPos, newPos);  
+    this.mlService.train(this.xCmd, this.yCmd, oldPos, newPos);
   }
 
   /** get bot's current Cartesian position */
@@ -227,18 +231,18 @@ export class AppComponent implements OnInit {
     yC = slope * xC; // always 0 for now
 
     // actual x and y center coordinates
-    x = xC + x2; 
-    y = yC + y2; 
+    x = xC + x2;
+    y = yC + y2;
     console.log('actual center coordinates: (' + x + ', ' + y + ')');
 
     sAngle = isCounterClock ? Math.PI : 0; // start angle in rad
     console.log('arcilength = ' + arciLength + ', ri = ' + ri);
     eAngle = isCounterClock ? Math.PI - (arciLength / ri) : (arciLength / ri); // calc end angle in radians
     console.log('end angle = ' + eAngle + ' radians');
-    
+
     // clears canvas and draws path
     this.ctx.beginPath();
-    this.ctx.arc(x,y,r,sAngle,eAngle,isCounterClock);
+    this.ctx.arc(x, y, r, sAngle, eAngle, isCounterClock);
     this.ctx.stroke();
 
     // find change in x and y from center of bot
@@ -251,11 +255,11 @@ export class AppComponent implements OnInit {
     let arcCLength = r * eAngle;
 
     if (!isCounterClock) {
-        // just subtract center arc angle (theta = s/r)
-        angle = angle - arcCLength / r;
+      // just subtract center arc angle (theta = s/r)
+      angle = angle - arcCLength / r;
     }
     else {
-        angle = angle + arcCLength / r;
+      angle = angle + arcCLength / r;
     }
     console.log('angle from origin = ' + angle);
 
@@ -282,7 +286,7 @@ export class AppComponent implements OnInit {
   //   }
   //   let endX = Cx + r * Math.cos(angle);
   //   let endY = Cy + r * Math.sin(angle);
-    
+
   //   let xChange = endX - startX;
   //   let yChange = endY - startY;
   //   console.log('xChange = ' + xChange + ', yChange = ' + yChange);
@@ -295,7 +299,7 @@ export class AppComponent implements OnInit {
     bigSpeed = leftSpeed > rightSpeed ? leftSpeed : rightSpeed;
     smallSpeed = leftSpeed > rightSpeed ? rightSpeed : leftSpeed;
 
-    r = this.mlService.botWidth / (bigSpeed/smallSpeed - 1);
+    r = this.mlService.botWidth / (bigSpeed / smallSpeed - 1);
     r += this.mlService.botWidth / 2;
     return r;
   }
