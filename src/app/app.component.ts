@@ -24,11 +24,11 @@ export class AppComponent implements OnInit {
   canvasHeight: number;
   currAngle: number = 0;
   // training //
-  xCmd: number;
-  yCmd: number;
+  leftCmd: number;
+  rightCmd: number;
   // working //
-  pointsArray: any[] = [];
-  cleanPointsArray: any[] = [];
+  pointsArray: { x: number, y: number}[] = [];
+  cleanPointsArray: { x: number, y: number}[] = [];
 
   constructor(private mlService: MlService) { }
 
@@ -73,27 +73,27 @@ export class AppComponent implements OnInit {
     // path doesn't close until logPoints() called
     this.ctx.beginPath();
 
-    this.drawBot(); 
+    this.drawBot();
   }
 
   drawBot() {
-    // robot
     // let img = new Image();
     // img.src = '../assets/robot50.jpg';
     // this.ctx.drawImage(img, 50, 50);
     // this.bot = this.ctx.fillRect(250, 250, 50, 50);    
     this.ctx.strokeStyle = 'black';
     this.ctx.fillStyle = 'orange';
-    let startX = this.mlService.botStart.x; 
-    let startY = this.mlService.botStart.y; 
-    let width = this.mlService.botWidth; 
+    let startX = this.mlService.botStart.x;
+    let startY = this.mlService.botStart.y;
+    let width = this.mlService.botWidth;
+    let height = this.mlService.botHeight; 
 
     this.ctx.beginPath();
     this.ctx.moveTo(startX, startY);
     this.ctx.lineTo(startX + width, startY);
-    this.ctx.lineTo(startX + 10, startY - 30);
-    this.ctx.moveTo(startX + 40, startY - 30);
-    this.ctx.lineTo(startX + 10, startY - 30);
+    this.ctx.lineTo(startX + 10, startY - (height - 10));
+    this.ctx.moveTo(startX + 40, startY - (height - 10));
+    this.ctx.lineTo(startX + 10, startY - (height - 10));
     this.ctx.lineTo(startX + width, startY);
     this.ctx.fill();
   }
@@ -138,7 +138,7 @@ export class AppComponent implements OnInit {
     this.ctx.lineWidth = this.y;
     this.ctx.stroke();
 
-    this.pointsArray.push({ x: this.prevX, y: this.prevY });
+    this.pointsArray.push({ x: this.prevX, y: this.prevY});
   }
 
   erase() {
@@ -153,7 +153,7 @@ export class AppComponent implements OnInit {
     this.drawBot();
   }
 
-  logPoints() {
+  calculateCleanPoints(doDraw?: boolean) {
     this.ctx.closePath();
 
     // select only certain points that are far away enough from each other
@@ -177,13 +177,16 @@ export class AppComponent implements OnInit {
     console.log('Points array has length ' + this.pointsArray.length);
     console.log('Cleaned points array has length ' + this.cleanPointsArray.length);
 
-    this.cleanPointsArray.forEach(pt => {
-      // draw circle at point
-      this.ctx.beginPath();
-      this.ctx.arc(pt.x, pt.y, 5, 0, 2 * Math.PI);
-      this.ctx.fillStyle = 'orange';
-      this.ctx.fill();
-    });
+    // draw clean points if doDraw undefined or true
+    if (doDraw == undefined || doDraw == true) {
+      this.cleanPointsArray.forEach(pt => {
+        // draw circle at point
+        this.ctx.beginPath();
+        this.ctx.arc(pt.x, pt.y, 5, 0, 2 * Math.PI);
+        this.ctx.fillStyle = 'orange';
+        this.ctx.fill();
+      });
+    }
   }
 
   /* training */
@@ -193,15 +196,19 @@ export class AppComponent implements OnInit {
     console.log('Training ML model');
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     let oldPos = this.getBotPos();
-    this.moveBot(this.xCmd, this.yCmd);
-    let newPos = this.getBotPos();
+    this.moveBot(this.leftCmd, this.rightCmd);
+    // let newPos = this.getBotPos();
+    // TODO: temp calculate final pos since actual bot moving not working
+    let translation: number[] = this.mlService.executeMotorCmd(this.leftCmd, this.rightCmd); 
+    let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]]; 
 
-    this.mlService.train(this.xCmd, this.yCmd, oldPos, newPos);
+    this.mlService.train(this.leftCmd, this.rightCmd, oldPos, newPos);
   }
 
   /** get bot's current Cartesian position */
-  getBotPos() {
+  getBotPos(): number[] {
     // get coordinates of body center
+    return [this.mlService.botCenter.x, this.mlService.botCenter.y]; 
   }
 
   /** move + animate both wheels of bot
@@ -210,7 +217,6 @@ export class AppComponent implements OnInit {
    */
   moveBot(leftSpd, rightSpd) {
     this.drawTravelPath(leftSpd, rightSpd);
-    
   }
 
   /** draws the path each bot part will move 
@@ -273,7 +279,7 @@ export class AppComponent implements OnInit {
     // clears canvas and draws ARC
     this.currAngle = 0;
     this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
- 
+
 
     // find change in x and y from center of bot
     // start pos of bot center
@@ -332,7 +338,7 @@ export class AppComponent implements OnInit {
           this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
         });
       } else {
-        
+
       }
     } else {
       this.currAngle += 0.1;
@@ -342,10 +348,25 @@ export class AppComponent implements OnInit {
           this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
         });
       } else {
-        
+
       }
     }
     // Animate until end
-    
+
+  }
+
+  /* work */
+
+  /** moves bot along path, using ML predictions */
+  followPath() {
+    // for each point, predict motor commands to get there, then execute
+    this.calculateCleanPoints(); 
+    this.cleanPointsArray.forEach(point => {
+      let diff: number[] = this.mlService.calculatePosDifference(this.getBotPos(), [point.x, point.y]); 
+      console.log('Point difference: (' + diff[0] + ', ' + diff[1] + ')'); 
+      let cmd: number[][] = this.mlService.predictCmd(diff[0], diff[1]);
+      console.log('Predicted motor commands: (' + cmd[0][0] + ', ' + cmd[0][1] + ')');  
+      this.moveBot(cmd[0][0], cmd[0][1]); 
+    });
   }
 }

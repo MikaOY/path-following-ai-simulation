@@ -6,7 +6,7 @@
         <!-- path draw controls -->
         <div style="width:100%;">
           <button type="button" id="clr" class="canvas-btn btn btn-danger" (click)="erase()">Clear path</button>
-          <button type="button" class="canvas-btn btn btn-primary" (click)="logPoints()">Show points</button>
+          <button type="button" class="canvas-btn btn btn-primary" (click)="calculateCleanPoints(true)">Show points</button>
         </div>
       </div>
     </div>
@@ -28,7 +28,8 @@
             <input [(ngModel)]="yCmd" type="number" name="y" class="form-control" placeholder="revolutions/s">
           </div>
         </form>
-        <button class="btn btn-primary" (click)="train()">Execute</button>
+        <button class="btn btn-primary" (click)="train()">Train</button>
+        <button *ngIf="this.pointsArray.length > 0" class="full-btn btn btn-success" (click)="followPath()">Follow path</button>
       </div>
     </div>
   </div>

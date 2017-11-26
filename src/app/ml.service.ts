@@ -7,8 +7,10 @@ export class MlService {
 
   // simulated constants
   public wheelRadius: number = (50 / Math.PI); // ~1.6, circumference 10
-  public botStart: { x: number, y: number } = { x: 250, y: 250 };  
-  public botWidth: number = 50 // width between wheels in px
+  public botWidth: number = 50 // width between wheels in px 
+  public botHeight: number = 40
+  public botStart: { x: number, y: number } = { x: 250, y: 250 };
+  public botCenter: { x: number, y: number } = { x: this.botStart.x + (this.botWidth / 2), y: this.botStart.y - (this.botHeight / 2) };
   public timeUnit: number = 1 // number of seconds wheel rotation takes to complete 
 
   // service properties
@@ -19,12 +21,12 @@ export class MlService {
   constructor() { }
 
   /** train ML model with user-given commands */
-  train(leftCmd, rightCmd, pos, newPos) {
-    let translation: number[] = this.getPosChange(leftCmd, rightCmd);
-    if (!(translation && translation[0] && translation[2])) {
-      console.error('Translation calc given commands failed!')
+  train(leftCmd, rightCmd, pos: number[], newPos: number[]) {
+    if (!(pos && newPos && leftCmd && rightCmd)) {
+      console.error('Not enough defined params to train model!'); 
     } else {
-      this.record(leftCmd, rightCmd, translation[0], translation[1]);
+      let diff: number[] = this.calculatePosDifference(pos, newPos); 
+      this.record(leftCmd, rightCmd, diff[0], diff[1]);
 
       // train the model on training data
       this.regressionModel = new MLR(this.inputPositionChanges, this.outputCommands);
@@ -41,12 +43,22 @@ export class MlService {
   }
 
   /**
+   * Calculates difference in Cartesian positions
+   * @param {number[]} position1
+   * @param {number[]} position2 
+   * @returns {[x, y]} - change in Cartesian position, given as a 1D array with x and y component of translation
+   */
+  calculatePosDifference(pos1: number[], pos2: number[]) {
+    return [pos2[0] - pos1[0], pos2[1] - pos1[1]];
+  }
+
+  /**
    * Calculates Cartesian translation of bot given left and right motor speed
    * @param {number} leftSpeed
    * @param {number} rightSpeed 
    * @returns {[x, y]} - change in Cartesian position, given as a 1D array with x and y component of translation
    */
-  getPosChange(leftSpeed: number, rightSpeed: number) {
+  executeMotorCmd(leftSpeed: number, rightSpeed: number) {
     let isCounterClock: boolean;
     let x, y, r, eAngle, xC, yC, slope, arciLength, currAngle: number;
     let sAngle: number = 0;
@@ -115,5 +127,19 @@ export class MlService {
     r = this.botWidth / (bigSpeed / smallSpeed - 1);
     r += this.botWidth / 2;
     return r;
+  }
+
+  /**
+   * Uses trained regression model to predict motor commands that will produce given Cartesian translation
+   * @param {number} changeX
+   * @param {number} changeY 
+   * @returns {[[leftCmd, rightCmd]]} - change in Cartesian position, given as a 1D array with x and y component of translation
+   */
+  predictCmd(changeX: number, changeY: number): number[][] {
+    if (this.regressionModel) {
+      return this.regressionModel.predict([[changeX, changeY]]);
+    } else {
+      console.error('Regression model undefined, cannot make prediction!'); 
+    }
   }
 }
