@@ -1,5 +1,6 @@
 
 import { Injectable } from '@angular/core';
+import MLR from 'ml-regression-multivariate-linear';
 
 @Injectable()
 export class MlService {
@@ -10,32 +11,25 @@ export class MlService {
   public timeUnit: number = 1 // number of seconds wheel rotation takes to complete 
 
   // service properties
-  private ml;
-  private SLR; // Simple Linear Regression
   private regressionModel;
   private inputPositionChanges: number[][] = [];
   private outputCommands: number[][] = [];
 
   constructor() {
-    // fetch ML JS
-    System.import('../../node_modules/ml-regression/src/index.js').then(file => {
-      this.ml = file;  
-      this.SLR = this.ml.SLR; 
-    });
-
     // mock only
     this.inputPositionChanges = [[3, 4], [5, 6], [8, 10], [3, 5]];
-    this.inputPositionChanges = [[2, 5], [4, 5], [6, 7], [2, 4]];
+    this.outputCommands = [[2, 5], [4, 5], [6, 7], [2, 4]];
   }
 
   /** train ML model with user-given commands */
   train(leftCmd, rightCmd, pos, newPos) {
-    var posChange = this.getPosChange(pos, newPos);
-    this.record(leftCmd, rightCmd, posChange.x, posChange.y);
+    // var posChange = this.getPosChange(pos, newPos);
+    // this.record(leftCmd, rightCmd, posChange.x, posChange.y);
 
     // train the model on training data
-    this.regressionModel = new this.SLR(this.inputPositionChanges, this.outputCommands);
-    console.log(this.regressionModel.toString(3));
+    this.regressionModel = new MLR(this.inputPositionChanges, this.outputCommands);
+    console.log(this.regressionModel);
+    console.log('Prediction with pos change [12,19] is ' + this.regressionModel.predict([[12, 19]]).toString());
   }
 
   /** record command and result of executing it as ML training data */

@@ -175,7 +175,7 @@ export class AppComponent implements OnInit {
     this.moveBot(this.xCmd, this.yCmd);
     let newPos = this.getBotPos();
 
-    //this.mlService.train(this.xCmd, this.yCmd, oldPos, newPos);  
+    this.mlService.train(this.xCmd, this.yCmd, oldPos, newPos);  
   }
 
   /** get bot's current Cartesian position */
