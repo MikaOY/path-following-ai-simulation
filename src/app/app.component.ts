@@ -218,6 +218,16 @@ export class AppComponent implements OnInit {
       arciLength = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else {
       // travel in straight line
+      let xChange = 0;
+      let yChange = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
+
+      // draw line and rect
+      this.ctx.beginPath();
+      this.ctx.moveTo(x2, y2);
+      this.ctx.lineTo(x2, y2 + yChange);
+      this.ctx.fillRect(x2 - 5, y2 + yChange - 5, 10, 10);
+      this.ctx.stroke();
+      return [xChange, yChange];
     }
     console.log('radius of center arc = ' + r + ', isCounterClock = ' + isCounterClock);
 
@@ -226,7 +236,6 @@ export class AppComponent implements OnInit {
     slope = 0; // bot is not angled
 
     // CHANGE to the center of circle/arc from inner wheel
-    //xC = Math.sqrt((Math.pow(ri, 2) - Math.pow(slope, 2))/2);
     xC = isCounterClock ? ri : -ri; // only for straight bots
     yC = slope * xC; // always 0 for now
 
@@ -251,10 +260,10 @@ export class AppComponent implements OnInit {
     let startY = y; // always same as circle center for now
     this.ctx.fillRect(startX, startY, 20, 20);
     this.ctx.fillRect(x, y, 10, 10);
+
     // angle from origin
-    
     let angle = isCounterClock ? (2 * Math.PI) - eAngle : eAngle - sAngle;
-    console.log('angle from between origin = ' + angle);
+    console.log('angle from origin = ' + angle);
 
     // end position coordinates
     let endX = x + (r * Math.cos(angle));
@@ -268,24 +277,6 @@ export class AppComponent implements OnInit {
     console.log('xChange = ' + xChange + ', yChange = ' + yChange);
     return [xChange, yChange];
   }
-
-  // findChange(startX, startY, Cx, Cy, length, isCounterClock): number[] {
-  //   let r = Math.sqrt(Math.pow(startX - Cx, 2) + Math.pow(startY - Cy, 2));
-  //   let angle = Math.atan2(startY - Cy, startX - Cx);
-  //   if (!isCounterClock) {
-  //       angle = angle - length / r;
-  //   }
-  //   else {
-  //       angle = angle + length / r;
-  //   }
-  //   let endX = Cx + r * Math.cos(angle);
-  //   let endY = Cy + r * Math.sin(angle);
-
-  //   let xChange = endX - startX;
-  //   let yChange = endY - startY;
-  //   console.log('xChange = ' + xChange + ', yChange = ' + yChange);
-  //   return [xChange, yChange];
-  // }
 
   // returns radius to CENTER between wheels
   getRadius(leftSpeed: number, rightSpeed: number) {
