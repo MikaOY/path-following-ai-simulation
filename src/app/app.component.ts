@@ -216,12 +216,12 @@ export class AppComponent implements OnInit {
       // travel in straight line
     }
     console.log('radius of center arc = ' + r + ', isCounterClock = ' + isCounterClock);
-    // TODO: not necessarily subtracted?
+
     let ri = r - (this.mlService.botWidth / 2); // inner radius
     // slope = (this.y2 - this.y1) / (this.x2 - this.x1);
     slope = 0; // bot is not angled
 
-    // change to the center of circle/arc
+    // CHANGE to the center of circle/arc from inner wheel
     //xC = Math.sqrt((Math.pow(ri, 2) - Math.pow(slope, 2))/2);
     xC = isCounterClock ? ri : -ri; // only for straight bots
     yC = slope * xC; // always 0 for now
@@ -240,7 +240,6 @@ export class AppComponent implements OnInit {
     this.ctx.beginPath();
     this.ctx.arc(x,y,r,sAngle,eAngle,isCounterClock);
     this.ctx.stroke();
-  }
 
     // find change in x and y from center of bot
     // start pos of bot center
@@ -252,16 +251,20 @@ export class AppComponent implements OnInit {
     let arcCLength = r * eAngle;
 
     if (!isCounterClock) {
+        // just subtract center arc angle (theta = s/r)
         angle = angle - arcCLength / r;
     }
     else {
         angle = angle + arcCLength / r;
     }
     console.log('angle from origin = ' + angle);
+
     // end position coordinates
     let endX = x + r * Math.cos(angle);
     let endY = y + r * Math.sin(angle);
-    
+    console.log('endX = ' + endX + ', endY = ' + endY);
+
+    // subtract from start coordinates to get change
     let xChange = endX - startX;
     let yChange = (endY - startY); // negate for weird canvas system
     console.log('xChange = ' + xChange + ', yChange = ' + yChange);
