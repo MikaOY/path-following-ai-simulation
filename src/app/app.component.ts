@@ -205,6 +205,7 @@ export class AppComponent implements OnInit {
     if (leftSpeed > rightSpeed) {
       isCounterClock = false; // travel clockwise
       r = this.getRadius(leftSpeed, rightSpeed);
+      // calculate inner arc length, in this case right wheel
       arciLength = rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else if (leftSpeed < rightSpeed) {
       isCounterClock = true; // travel counterclock
@@ -229,37 +230,58 @@ export class AppComponent implements OnInit {
     console.log('actual center coordinates: (' + x + ', ' + y + ')');
 
     sAngle = isCounterClock ? Math.PI : 0;
+    console.log('arcilength = ' + arciLength + ', ri = ' + ri);
     eAngle = arciLength / ri // calc angle in radians
     console.log('end angle = ' + eAngle + ' radians');
-
-    let startX = isCounterClock ? x - r : x + r; // doesn't account for non-straight bots
-    let startY = y; // always y2 for now
-
-    let arcCLength = r * (Math.PI / eAngle);
-    this.findChange(startX, startY, x, y, arcCLength, isCounterClock);
     
+    // clears canvas and draws path
+    this.ctx.beginPath();
     this.ctx.arc(x,y,r,sAngle,eAngle,isCounterClock);
     this.ctx.stroke();
 
-  }
+    // find change in x and y from center of bot
+    // start pos of bot center
+    let startX = isCounterClock ? x - r : x + r; // doesn't account for non-straight bots
+    let startY = y; // always y2 for now
 
-  findChange(startX, startY, Cx, Cy, length, isCounterClock): number[] {
-    let r = Math.sqrt(Math.pow(startX - Cx, 2) + Math.pow(startY - Cy, 2));
-    let angle = Math.atan2(startY - Cy, startX - Cx);
+    // angle from origin
+    let angle = Math.atan2(startY - y, startX - x);
+    let arcCLength = r * eAngle;
+
     if (!isCounterClock) {
-        angle = angle - length / r;
+        angle = angle - arcCLength / r;
     }
     else {
-        angle = angle + length / r;
+        angle = angle + arcCLength / r;
     }
-    let endX = Cx + r * Math.cos(angle);
-    let endY = Cy + r * Math.sin(angle);
+    console.log('angle from origin = ' + angle);
+    // end position coordinates
+    let endX = x + r * Math.cos(eAngle);
+    let endY = y + r * Math.sin(eAngle);
     
     let xChange = endX - startX;
     let yChange = endY - startY;
     console.log('xChange = ' + xChange + ', yChange = ' + yChange);
     return [xChange, yChange];
   }
+
+  // findChange(startX, startY, Cx, Cy, length, isCounterClock): number[] {
+  //   let r = Math.sqrt(Math.pow(startX - Cx, 2) + Math.pow(startY - Cy, 2));
+  //   let angle = Math.atan2(startY - Cy, startX - Cx);
+  //   if (!isCounterClock) {
+  //       angle = angle - length / r;
+  //   }
+  //   else {
+  //       angle = angle + length / r;
+  //   }
+  //   let endX = Cx + r * Math.cos(angle);
+  //   let endY = Cy + r * Math.sin(angle);
+    
+  //   let xChange = endX - startX;
+  //   let yChange = endY - startY;
+  //   console.log('xChange = ' + xChange + ', yChange = ' + yChange);
+  //   return [xChange, yChange];
+  // }
 
   // returns radius to CENTER between wheels
   getRadius(leftSpeed: number, rightSpeed: number) {
