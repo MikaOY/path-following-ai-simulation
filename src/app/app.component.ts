@@ -84,13 +84,17 @@ export class AppComponent implements OnInit {
     // this.bot = this.ctx.fillRect(250, 250, 50, 50);    
     this.ctx.strokeStyle = 'black';
     this.ctx.fillStyle = 'orange';
+    let startX = this.mlService.botStart.x; 
+    let startY = this.mlService.botStart.y; 
+    let width = this.mlService.botWidth; 
+
     this.ctx.beginPath();
-    this.ctx.moveTo(250, 250);
-    this.ctx.lineTo(300, 250);
-    this.ctx.lineTo(260, 220);
-    this.ctx.moveTo(290, 220);
-    this.ctx.lineTo(260, 220);
-    this.ctx.lineTo(300, 250);
+    this.ctx.moveTo(startX, startY);
+    this.ctx.lineTo(startX + width, startY);
+    this.ctx.lineTo(startX + 10, startY - 30);
+    this.ctx.moveTo(startX + 40, startY - 30);
+    this.ctx.lineTo(startX + 10, startY - 30);
+    this.ctx.lineTo(startX + width, startY);
     this.ctx.fill();
   }
 
