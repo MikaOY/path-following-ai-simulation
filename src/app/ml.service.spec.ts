@@ -1,15 +1,15 @@
 import { TestBed, inject } from '@angular/core/testing';
 
-import { MlserviceService } from './mlservice.service';
+import { MlService } from './ml.service';
 
-describe('MlserviceService', () => {
+describe('MlService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [MlserviceService]
+      providers: [MlService]
     });
   });
 
-  it('should be created', inject([MlserviceService], (service: MlserviceService) => {
+  it('should be created', inject([MlService], (service: MlService) => {
     expect(service).toBeTruthy();
   }));
 });
