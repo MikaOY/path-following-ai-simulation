@@ -55,4 +55,80 @@ export class MlService {
   predictCommand(xDiff, yDiff) {
     this.regressionModel.predict([[xDiff, yDiff]]);
   }
+
+  /**
+   * Calculates path of bot given params
+   * @param leftSpeed 
+   * @param rightSpeed 
+   */
+  getChange(leftSpeed: number, rightSpeed: number) {
+    let isCounterClock: boolean;
+    let x, y, r, eAngle, xC, yC, slope, arciLength, currAngle: number;
+    let sAngle: number = 0;
+    let x2: number = 250; // pos of right bottom of rect (inner arc)
+    let y2: number = 250; // pos of right bottom of rect (inner arc)
+
+    if (leftSpeed > rightSpeed) {
+      isCounterClock = false; // travel clockwise
+      r = this.getRadius(leftSpeed, rightSpeed);
+      // calculate inner arc length, in this case right wheel
+      arciLength = rightSpeed * (this.wheelRadius * 2 * Math.PI) * this.timeUnit;
+    } else if (leftSpeed < rightSpeed) {
+      isCounterClock = true; // travel counterclock
+      r = this.getRadius(leftSpeed, rightSpeed);
+      arciLength = leftSpeed * (this.wheelRadius * 2 * Math.PI) * this.timeUnit;
+    } else {
+      // travel in straight line
+      let xChange = 0;
+      let yChange = leftSpeed * (this.wheelRadius * 2 * Math.PI) * this.timeUnit;
+
+      return [xChange, yChange];
+    }
+
+    let ri = r - (this.botWidth / 2); // inner radius
+    // slope = (this.y2 - this.y1) / (this.x2 - this.x1);
+    slope = 0; // bot is not angled
+
+    // CHANGE to the center of circle/arc from inner wheel
+    xC = isCounterClock ? ri : -ri; // only for straight bots
+    yC = slope * xC; // always 0 for now
+
+    // actual x and y center coordinates
+    x = xC + x2;
+    y = yC + y2;
+
+    sAngle = isCounterClock ? Math.PI : 0; // start angle in rad
+    eAngle = isCounterClock ? Math.PI - (arciLength / ri) : (arciLength / ri); // calc end angle in radians
+
+    // find change in x and y from center of bot
+    // start pos of bot center
+    let startX = isCounterClock ? x - r : x + r; // doesn't account for non-straight bots
+    let startY = y; // always same as circle center for now
+
+    // angle from origin
+    let angle = isCounterClock ? (2 * Math.PI) - eAngle : eAngle - sAngle;
+
+    // end position coordinates
+    let endX = x + (r * Math.cos(angle));
+    let endY = isCounterClock ? y - (r * Math.sin(angle)) : y + (r * Math.sin(angle));
+
+    // subtract from start coordinates to get change
+    let xChange = endX - startX;
+    let yChange = (endY - startY); // negate for weird canvas system
+    console.log('Left speed = ' + leftSpeed + ', rightSpeed = ' + rightSpeed + ', xChange = ' + xChange + ', yChange = ' + yChange);
+    return [xChange, yChange];
+  }
+
+  /** 
+   * returns radius to CENTER between wheels
+   */
+  getRadius(leftSpeed: number, rightSpeed: number) {
+    let bigSpeed, smallSpeed, r: number;
+    bigSpeed = leftSpeed > rightSpeed ? leftSpeed : rightSpeed;
+    smallSpeed = leftSpeed > rightSpeed ? rightSpeed : leftSpeed;
+
+    r = this.botWidth / (bigSpeed / smallSpeed - 1);
+    r += this.botWidth / 2;
+    return r;
+  }
 }
