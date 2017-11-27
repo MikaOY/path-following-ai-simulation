@@ -223,60 +223,58 @@ export class AppComponent implements OnInit {
    * @returns {{x,y}} - change in x and y distance
   */
   drawTravelPath(leftSpeed: number, rightSpeed: number): number[] {
-    // calculate arc/ path of left wheel, right wheel, and body based on speeds given
+    // calculate arc/ path of body based on speeds given
     let isCounterClock: boolean;
-    let x, y, r, eAngle, xC, yC, slope, arciLength, currAngle: number;
-    let sAngle: number = 0;
-    let x2: number = 250; // pos of right bottom of rect (inner arc)
-    let y2: number = 250; // pos of right bottom of rect (inner arc)
+    let x, y, r, endAngle, centerX, centerY, slope, innerArcLength, currAngle: number;
+    let startAngle: number = 0;
 
+    // 1 - determine direction of turn if turning; else simply draw straight path
     if (leftSpeed > rightSpeed) {
-      isCounterClock = false; // travel clockwise
-      r = this.mlService.getRadius(leftSpeed, rightSpeed);
-      // calculate inner arc length, in this case right wheel
-      arciLength = rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
+      isCounterClock = false; 
+      innerArcLength = rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else if (leftSpeed < rightSpeed) {
-      isCounterClock = true; // travel counterclock
-      r = this.mlService.getRadius(leftSpeed, rightSpeed);
-      arciLength = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
+      isCounterClock = true;
+      innerArcLength = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else {
       // travel in straight line
       let xChange = 0;
-      let yChange = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
-
-      // draw line and rect
+      let yChange = -(leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit);
+      // draw line 
       this.ctx.beginPath();
-      this.ctx.moveTo(x2, y2);
-      this.ctx.lineTo(x2, y2 + yChange);
-      this.ctx.fillRect(x2 - 5, y2 + yChange - 5, 10, 10);
+      this.ctx.moveTo(this.mlService.botCenter.x, this.mlService.botCenter.y);
+      this.ctx.lineTo(this.mlService.botCenter.x, this.mlService.botCenter.y + yChange);
       this.ctx.stroke();
+
+      // update bot center 
+      this.mlService.botCenter.y += yChange; 
       return [xChange, yChange];
     }
-    console.log('ANI: inner arc radius = ' + r);
     console.log('ANI: isCounterCLockwise = ' + isCounterClock);
 
-    let ri = r - (this.mlService.botWidth / 2); // inner radius
-    // slope = (this.y2 - this.y1) / (this.x2 - this.x1);
-    slope = 0; // bot is not angled
+    // 2 - find center of arc path
+    r = this.mlService.getRadius(leftSpeed, rightSpeed);    
+    let innerR = r - (this.mlService.botWidth / 2);
+    console.log('ANI: inner arc length = ' + innerArcLength + ', inner arc radius = ' + innerR);
 
-    // CHANGE to the center of circle/arc from inner wheel
-    xC = isCounterClock ? ri : -ri; // only for straight bots
-    yC = slope * xC; // always 0 for now
+    // TODO: factor angled bot into calc
+    slope = 0; // temp only
+    let botToArcCenterDiffX = isCounterClock ? innerR : -innerR; // only for straight paths
+    let botToArcCenterDiffY = centerY = slope * centerX; // always 0 for now
+    x = centerX + this.mlService.botCenter.x;
+    y = centerY + this.mlService.botCenter.y;
+    console.log('ANI: arc center coordinates: (' + x + ', ' + y + ')');
 
-    // actual x and y center coordinates
-    x = xC + x2;
-    y = yC + y2;
-    console.log('ANI: center coordinates: (' + x + ', ' + y + ')');
-
-    sAngle = isCounterClock ? Math.PI : 0; // start angle in rad
-    console.log('ANI: inner arc length = ' + arciLength + ', inner arc radius = ' + ri);
-    eAngle = isCounterClock ? Math.PI - (arciLength / ri) : (arciLength / ri); // calc end angle in radians
-    console.log('ANI: end angle = ' + eAngle + ' radians');
+    // TODO: factor angled bot into calc
+    startAngle = isCounterClock ? Math.PI : 0; // start angle in rad
+    endAngle = isCounterClock ? Math.PI - (innerArcLength / innerR) : (innerArcLength / innerR); // calc end angle in radians
+    console.log('ANI: start angle = ' + startAngle + ' radians');
+    console.log('ANI: end angle = ' + endAngle + ' radians');
 
     // clears canvas and draws ARC
     this.currAngle = 0;
-    this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
+    this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock);
 
+    // END HERE
 
     // find change in x and y from center of bot
     // start pos of bot center
@@ -286,7 +284,7 @@ export class AppComponent implements OnInit {
     this.ctx.fillRect(x, y, 10, 10);
 
     // angle from origin
-    let angle = isCounterClock ? (2 * Math.PI) - eAngle : eAngle - sAngle;
+    let angle = isCounterClock ? (2 * Math.PI) - endAngle : endAngle - startAngle;
     console.log('ANI: counterclockwise angle from origin = ' + angle);
 
     // end position coordinates
@@ -316,33 +314,33 @@ export class AppComponent implements OnInit {
   }
 
   /** animates all provided objects along provided path, starting and ending at the same time */
-  animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock) {
+  animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock) {
     // get path (stored as properties) and animate left wheel, right wheel, and body along them
     // Clear off the canvas
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     // Start over
     this.ctx.beginPath();
-    // Re-draw from the very beginning each time so there isn't tiny line spaces between each section (the browser paint rendering will probably be smoother too)
-    this.ctx.arc(x, y, r, sAngle, sAngle + this.currAngle, isCounterClock);
+    // Re-draw from the very beginning each time so there isn't tiny line spaces between each section 
+    this.ctx.arc(x, y, r, startAngle, startAngle + this.currAngle, isCounterClock);
     // Draw
     this.ctx.stroke();
     // Increment percent
     if (isCounterClock) {
       this.currAngle -= 0.1;
-      if (sAngle + this.currAngle > eAngle) {
+      if (startAngle + this.currAngle > endAngle) {
         // Recursive repeat this function until the end is reached
         window.requestAnimationFrame(() => {
-          this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
+          this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock);
         });
       } else {
 
       }
     } else {
       this.currAngle += 0.1;
-      if (sAngle + this.currAngle < eAngle) {
+      if (startAngle + this.currAngle < endAngle) {
         // Recursive repeat this function until the end is reached
         window.requestAnimationFrame(() => {
-          this.animateBotAlongPath(x, y, r, sAngle, eAngle, isCounterClock);
+          this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock);
         });
       } else {
 
