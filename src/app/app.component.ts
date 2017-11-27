@@ -23,6 +23,7 @@ export class AppComponent implements OnInit {
   canvasWidth: number;
   canvasHeight: number;
   currAngle: number = 0;
+  startAngle: number = 0;
   // training //
   leftCmd: number;
   rightCmd: number;
@@ -73,14 +74,15 @@ export class AppComponent implements OnInit {
     // path doesn't close until logPoints() called
     this.ctx.beginPath();
 
-    this.drawBot();
+    this.drawBot(250, 250); 
   }
 
-  drawBot() {
-    // let img = new Image();
-    // img.src = '../assets/robot50.jpg';
-    // this.ctx.drawImage(img, 50, 50);
-    // this.bot = this.ctx.fillRect(250, 250, 50, 50);    
+  /**
+   * Draws bot with center x, y
+   * @param x 
+   * @param y 
+   */
+  drawBot(x, y) {
     this.ctx.strokeStyle = 'black';
     this.ctx.fillStyle = 'orange';
     let startX = this.mlService.botStart.x;
@@ -150,7 +152,7 @@ export class AppComponent implements OnInit {
     }
 
     // redraw bot
-    this.drawBot();
+    this.drawBot(250, 250);
   }
 
   calculateCleanPoints(doDraw?: boolean) {
@@ -223,11 +225,10 @@ export class AppComponent implements OnInit {
    * @returns {{x,y}} - change in x and y distance
   */
   drawTravelPath(leftSpeed: number, rightSpeed: number): number[] {
-    // calculate arc/ path of body based on speeds given //
+    // calculate arc / path of body based on speeds given //
 
     let isCounterClock: boolean;
     let centerX, centerY, r, endAngle, slope, innerArcLength, currAngle: number;
-    let startAngle: number = 0;
 
     // 1 - determine direction of turn if turning; else simply draw straight path
     if (leftSpeed > rightSpeed) {
@@ -267,9 +268,9 @@ export class AppComponent implements OnInit {
 
     // 3 - find start and end angle
     // TODO: factor angled bot into calc
-    startAngle = (isCounterClock ? Math.PI : 0) + Math.PI;
+    this.startAngle = (isCounterClock ? Math.PI : 0) + Math.PI;
     endAngle = (isCounterClock ? Math.PI - (innerArcLength / innerR) : (innerArcLength / innerR)) + Math.PI; 
-    console.log('ANI: start angle = ' + startAngle + ' radians');
+    console.log('ANI: start angle = ' + this.startAngle + ' radians');
     console.log('ANI: end angle = ' + endAngle + ' radians');
 
     // find translation caused by motor movement //
@@ -283,7 +284,7 @@ export class AppComponent implements OnInit {
     this.ctx.fillStyle = 'orange';
 
     // find angle from origin
-    let angle = isCounterClock ? (2 * Math.PI) - endAngle : endAngle - startAngle;
+    let angle = isCounterClock ? (2 * Math.PI) - endAngle : endAngle - this.startAngle;
     console.log('ANI: counterclockwise angle from origin = ' + angle);
 
     // end position coordinates
