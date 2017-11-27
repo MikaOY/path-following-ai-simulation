@@ -288,12 +288,12 @@ export class AppComponent implements OnInit {
     this.ctx.fillStyle = 'orange';
 
     // find angle from origin
-    let angle = isCounterClock ? (2 * Math.PI) - endAngle : endAngle - this.startAngle;
+    let angle = isCounterClock ? (2 * Math.PI) - endAngle : (2 * Math.PI) - endAngle;
     console.log('ANI: counterclockwise angle from origin = ' + angle);
 
     // end position coordinates
     let endX = centerX + (r * Math.cos(angle));
-    let endY = isCounterClock ? centerY - (r * Math.sin(angle)) : centerY + (r * Math.sin(angle));
+    let endY = isCounterClock ? centerY - (r * Math.sin(angle)) : centerY - (r * Math.sin(angle));
     console.log('ANI: endingX = ' + endX + ', endingY = ' + endY);
     this.ctx.fillRect(endX, endY, 20, 20);
 
@@ -306,9 +306,11 @@ export class AppComponent implements OnInit {
     this.mlService.botCenter.y += yChange;
 
     // clear canvas and draw movement path //
-
+    let startPos: { x: number, y: number } = { x: startX, y: startY };
+    let endPos: { x: number, y: number } = { x: endX, y: endY };
     this.currAngle = 0;
-    this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startX, startY);
+    console.log('ani = ' + startPos.x);
+    this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
 
     return [xChange, yChange];
   }
@@ -327,7 +329,7 @@ export class AppComponent implements OnInit {
   }
 
   /** animates all provided objects along provided path, starting and ending at the same time */
-  animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startX, startY) {
+  animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos) {
     // get path (stored as properties) and animate left wheel, right wheel, and body along them
     // Clear off the canvas
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -343,7 +345,7 @@ export class AppComponent implements OnInit {
       if (startAngle + this.currAngle > endAngle) {
         // Recursive repeat this function until the end is reached
         window.requestAnimationFrame(() => {
-          this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startX, startY);
+          this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
         });
       }
     } else {
@@ -351,7 +353,7 @@ export class AppComponent implements OnInit {
       if (startAngle + this.currAngle < endAngle) {
         // Recursive repeat this function until the end is reached
         window.requestAnimationFrame(() => {
-          this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startX, startY);
+          this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
         });
       }
     }
@@ -359,7 +361,11 @@ export class AppComponent implements OnInit {
     // draw ref points
     // bot start point
     this.ctx.beginPath();
-    this.ctx.arc(startX, startY, 10, 0, 2 * Math.PI);
+    this.ctx.arc(startPos.x, startPos.y, 10, 0, 2 * Math.PI);
+
+    // bot end point
+    this.ctx.moveTo(0, 0);
+    this.ctx.arc(endPos.x, endPos.y, 10, 0, 2 * Math.PI);
     
     // center of path
     this.ctx.moveTo(0, 0); // don't connect circles

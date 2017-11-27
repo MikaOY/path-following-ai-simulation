@@ -134,7 +134,7 @@ export class MlService {
 
     r = this.botWidth / (bigSpeed / smallSpeed - 1);
     r += this.botWidth / 2;
-    return r;
+    return Math.abs(r);
   }
 
   /**
