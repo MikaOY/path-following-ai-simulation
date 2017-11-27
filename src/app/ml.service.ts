@@ -155,9 +155,7 @@ export class MlService {
    * Resets stored position to original
    */
   resetBot() {
-    this.CONST_BOT_START.x = 250;
-    this.CONST_BOT_START.y = 250;
-    this.botCenter.x = this.CONST_BOT_START.x + (this.botWidth / 2);
-    this.botCenter.y = this.CONST_BOT_START.y - (this.botHeight / 2);
+    this.botCenter = this.CONST_BOT_CENTER;
+    // TODO: reset angle as well
   }
 }

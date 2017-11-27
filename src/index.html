@@ -21,6 +21,20 @@
 
 <body>
   <app-root></app-root>
+
+  <script type="text/javascript">
+    // BS tooltips
+    $(function () {
+      $("[rel='tooltip']").tooltip();
+    });
+    // BS popover
+    $(function () {
+      $('[data-toggle="popover"]').popover()
+    })
+    $('.popover-dismiss').popover({
+      trigger: 'focus'
+    })
+  </script>
 </body>
 
 </html>

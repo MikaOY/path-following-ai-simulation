@@ -47,13 +47,26 @@ div.options {
 .inline {
   display: inline; 
 }
+h6.inline {
+  @extend .inline; 
+  @media (max-width: 1020px) { 
+    font-size: 0.9em; 
+  }
+  @media (max-width: 991px) { 
+    font-size: 1em; 
+  }
+}
 
 div.form-group {
   margin-top: 0.5em; 
 }
 
-button.full-btn {
+.full-btn {
   display: block; 
   width: 100%;
-  margin: 0.5em auto; 
+  margin: 0.75em auto; 
+}
+
+button.no-click {
+  opacity: 0.5; 
 }

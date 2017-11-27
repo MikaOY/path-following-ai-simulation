@@ -6,7 +6,7 @@
         <!-- path draw controls -->
         <div style="width:100%;">
           <button type="button" class="canvas-btn btn btn-primary" (click)="calculateCleanPoints(true)">Show points</button>
-          <button type="button" id="clr" class="canvas-btn btn btn-danger" (click)="reset()">Reset</button>          
+          <button type="button" id="clr" class="canvas-btn btn btn-danger" (click)="reset()">Reset</button>
         </div>
       </div>
     </div>
@@ -30,7 +30,10 @@
           </div>
         </form>
         <button class="btn btn-primary" (click)="train()">Train</button>
-        <button *ngIf="this.pointsArray.length > 0" class="full-btn btn btn-success" (click)="followPath()">Follow path</button>
+        <a tabindex="0" class="full-btn btn btn-success" role="button" data-toggle="popover" data-trigger="focus" 
+          data-placement="bottom" title="Warning" data-content="Train bot before following path">
+          Follow path
+        </a>
       </div>
     </div>
   </div>

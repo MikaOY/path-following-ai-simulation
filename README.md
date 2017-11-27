@@ -34,6 +34,6 @@ importing JS libraries into Angular apps - https://stackoverflow.com/questions/4
 
 # TODO
 
-TODO: show bot when exec cmd
-TODO: update bot center pos 
-TODO: add reset bot option
+TODO: intuitive follow path guides
+TODO: usage tooltips
+TODO: reset movement vars when resetting all
