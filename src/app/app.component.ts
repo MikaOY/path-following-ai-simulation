@@ -360,9 +360,10 @@ export class AppComponent implements OnInit {
     this.ctx.arc(startX, startY, 10, 0, 2 * Math.PI);
     // center of path
     this.ctx.arc(x, y, 5, 0, 2 * Math.PI);
+    // original starting
+    this.ctx.arc(250 + this.mlService.botWidth/2, 250 - this.mlService.botHeight/2, 10, 0, 2 * Math.PI);
     this.ctx.fillStyle = 'red';
     this.ctx.fill();
-    this.ctx.fillRect(250, 250, 10, 10);
   }
 
   /* work */
