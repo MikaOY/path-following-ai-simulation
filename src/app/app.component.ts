@@ -27,8 +27,8 @@ export class AppComponent implements OnInit {
   leftCmd: number;
   rightCmd: number;
   // working //
-  pointsArray: { x: number, y: number}[] = [];
-  cleanPointsArray: { x: number, y: number}[] = [];
+  pointsArray: { x: number, y: number }[] = [];
+  cleanPointsArray: { x: number, y: number }[] = [];
 
   constructor(private mlService: MlService) { }
 
@@ -86,7 +86,7 @@ export class AppComponent implements OnInit {
     let startX = this.mlService.botStart.x;
     let startY = this.mlService.botStart.y;
     let width = this.mlService.botWidth;
-    let height = this.mlService.botHeight; 
+    let height = this.mlService.botHeight;
 
     this.ctx.beginPath();
     this.ctx.moveTo(startX, startY);
@@ -138,7 +138,7 @@ export class AppComponent implements OnInit {
     this.ctx.lineWidth = this.y;
     this.ctx.stroke();
 
-    this.pointsArray.push({ x: this.prevX, y: this.prevY});
+    this.pointsArray.push({ x: this.prevX, y: this.prevY });
   }
 
   erase() {
@@ -198,7 +198,7 @@ export class AppComponent implements OnInit {
     // get initial and final bot position
     let oldPos = this.getBotPos();
     let translation: number[] = this.moveBot(this.leftCmd, this.rightCmd);
-    let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]]; 
+    let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
 
     this.mlService.train(this.leftCmd, this.rightCmd, oldPos, newPos);
   }
@@ -206,7 +206,7 @@ export class AppComponent implements OnInit {
   /** get bot's current Cartesian position */
   getBotPos(): number[] {
     // get coordinates of body center
-    return [this.mlService.botCenter.x, this.mlService.botCenter.y]; 
+    return [this.mlService.botCenter.x, this.mlService.botCenter.y];
   }
 
   /** move + animate both wheels of bot
@@ -223,14 +223,15 @@ export class AppComponent implements OnInit {
    * @returns {{x,y}} - change in x and y distance
   */
   drawTravelPath(leftSpeed: number, rightSpeed: number): number[] {
-    // calculate arc/ path of body based on speeds given
+    // calculate arc/ path of body based on speeds given //
+
     let isCounterClock: boolean;
     let centerX, centerY, r, endAngle, slope, innerArcLength, currAngle: number;
     let startAngle: number = 0;
 
     // 1 - determine direction of turn if turning; else simply draw straight path
     if (leftSpeed > rightSpeed) {
-      isCounterClock = false; 
+      isCounterClock = false;
       innerArcLength = rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else if (leftSpeed < rightSpeed) {
       isCounterClock = true;
@@ -246,13 +247,13 @@ export class AppComponent implements OnInit {
       this.ctx.stroke();
 
       // update bot center 
-      this.mlService.botCenter.y += yChange; 
+      this.mlService.botCenter.y += yChange;
       return [xChange, yChange];
     }
     console.log('ANI: isCounterCLockwise = ' + isCounterClock);
 
     // 2 - find center of arc path
-    r = this.mlService.getRadius(leftSpeed, rightSpeed);    
+    r = this.mlService.getRadius(leftSpeed, rightSpeed);
     let innerR = r - (this.mlService.botWidth / 2);
     console.log('ANI: inner arc length = ' + innerArcLength + ', inner arc radius = ' + innerR);
 
@@ -264,21 +265,23 @@ export class AppComponent implements OnInit {
     centerY = botToArcCenterDiffY + this.mlService.botCenter.y;
     console.log('ANI: arc center coordinates: (' + centerX + ', ' + centerY + ')');
 
+    // 3 - find start and end angle
     // TODO: factor angled bot into calc
-    startAngle = isCounterClock ? Math.PI : 0; // start angle in rad
-    endAngle = isCounterClock ? Math.PI - (innerArcLength / innerR) : (innerArcLength / innerR); // calc end angle in radians
+    startAngle = (isCounterClock ? Math.PI : 0) + Math.PI;
+    endAngle = (isCounterClock ? Math.PI - (innerArcLength / innerR) : (innerArcLength / innerR)) + Math.PI; 
     console.log('ANI: start angle = ' + startAngle + ' radians');
     console.log('ANI: end angle = ' + endAngle + ' radians');
 
-    // clears canvas and draws arc
+    // clear canvas and draw movement path //
+
     this.currAngle = 0;
     this.animateBotAlongPath(centerX, centerY, r, startAngle, endAngle, isCounterClock);
 
-    // find translation caused by motor movement
+    // find translation caused by motor movement //
 
     // find start pos of bot (center)
     // TODO: factor in angled bot
-    let startX = isCounterClock ? centerX - r : centerX + r; 
+    let startX = isCounterClock ? centerX - r : centerX + r;
     let startY = centerY; // always same as circle center for now
     // draw movement ref points
     this.ctx.strokeStyle = 'black';
@@ -299,8 +302,11 @@ export class AppComponent implements OnInit {
 
     // subtract from start coordinates to get change
     let xChange = endX - startX;
-    let yChange = (endY - startY); 
+    let yChange = (endY - startY);
     console.log('ANI: xChange = ' + xChange + ', yChange = ' + yChange);
+    // update bot center 
+    this.mlService.botCenter.x += xChange;
+    this.mlService.botCenter.y += yChange;
     return [xChange, yChange];
   }
 
@@ -359,13 +365,13 @@ export class AppComponent implements OnInit {
   /** moves bot along path, using ML predictions */
   followPath() {
     // for each point, predict motor commands to get there, then execute
-    this.calculateCleanPoints(); 
+    this.calculateCleanPoints();
     this.cleanPointsArray.forEach(point => {
-      let diff: number[] = this.mlService.calculatePosDifference(this.getBotPos(), [point.x, point.y]); 
-      console.log('PATH: Point difference: (' + diff[0] + ', ' + diff[1] + ')'); 
+      let diff: number[] = this.mlService.calculatePosDifference(this.getBotPos(), [point.x, point.y]);
+      console.log('PATH: Point difference: (' + diff[0] + ', ' + diff[1] + ')');
       let cmd: number[][] = this.mlService.predictCmd(diff[0], diff[1]);
-      console.log('PATH: Predicted motor commands: (' + cmd[0][0] + ', ' + cmd[0][1] + ')');  
-      this.moveBot(cmd[0][0], cmd[0][1]); 
+      console.log('PATH: Predicted motor commands: (' + cmd[0][0] + ', ' + cmd[0][1] + ')');
+      this.moveBot(cmd[0][0], cmd[0][1]);
     });
   }
 }

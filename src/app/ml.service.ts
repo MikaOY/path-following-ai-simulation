@@ -65,7 +65,7 @@ export class MlService {
    * @param {number} rightSpeed 
    * @returns {[x, y]} - change in Cartesian position, given as a 1D array with x and y component of translation
    */
-  executeMotorCmd(leftSpeed: number, rightSpeed: number) {
+  executeMotorCmd(leftSpeed: number, rightSpeed: number): number[] {
     let isCounterClock: boolean;
     let x, y, r, eAngle, xC, yC, slope, arciLength, currAngle: number;
     let sAngle: number = 0;
