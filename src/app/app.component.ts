@@ -265,7 +265,7 @@ export class AppComponent implements OnInit {
     // difference to bot center to center
     let botToArcCenterDiffX = isCounterClock ? -r : r; // only for straight paths
     let botToArcCenterDiffY = slope * botToArcCenterDiffX; // always 0 for now
-    console.log('startBotCenter = (' + this.mlService.botCenter.x + ', ' + this.mlService.botCenter.y + ')');
+    console.log('ANI: startBotCenter = (' + this.mlService.botCenter.x + ', ' + this.mlService.botCenter.y + ')');
     centerX = botToArcCenterDiffX + this.mlService.botCenter.x;
     centerY = botToArcCenterDiffY + this.mlService.botCenter.y;
     console.log('ANI: arc center coordinates: (' + centerX + ', ' + centerY + ')');
