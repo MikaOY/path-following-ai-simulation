@@ -15,8 +15,8 @@ export class MlService {
 
   // service properties
   private regressionModel;
-  private inputPositionChanges: number[][] = [];
-  private outputCommands: number[][] = [];
+  public inputPositionChanges: number[][] = [];
+  public outputCommands: number[][] = [];
 
   constructor() { }
 

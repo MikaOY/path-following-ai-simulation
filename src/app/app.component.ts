@@ -203,8 +203,8 @@ export class AppComponent implements OnInit {
     let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]]; 
 
     this.mlService.train(this.leftCmd, this.rightCmd, oldPos, newPos);
+    console.log('Recorded inputs = ' + this.mlService.outputCommands.length);
 
-    // TODO: add training points indicator
     // TODO: show bot when exec cmd
     // TODO: update bot center pos 
     // TODO: add reset bot option

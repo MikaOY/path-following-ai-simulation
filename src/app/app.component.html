@@ -18,7 +18,8 @@
       <!-- command inputs to train movement -->
       <div class="options">
         <form>
-          <h3>Train model</h3>
+          <h3 class="inline">Train model</h3>
+          <h6 class="inline" style="color:gray;">{{this.mlService.outputCommands.length}} training points</h6>
           <div class="form-group">
             <label>Left wheel speed</label>
             <input [(ngModel)]="leftCmd" type="number" name="x" class="form-control" placeholder="revolutions/s">
