@@ -34,16 +34,19 @@ export class MlService {
 
       // train the model on training data
       this.regressionModel = new MLR(this.inputPositionChanges, this.outputCommands);
-      console.log(this.regressionModel);
-      console.log('Prediction with pos change [12,19] is ' + this.regressionModel.predict([[12, 19]]).toString());
+      console.log('ML: Latest regression model = ' + this.regressionModel);
+      // TODO: remove logs below      
+      console.log('ML: Prediction with pos change [100,200] is ' + this.regressionModel.predict([[100, 200]]).toString());
     }
   }
 
   /** record command and result of executing it as ML training data */
   record(leftCmd, rightCmd, xChange, yChange) {
     // plot left + right command, pos change X + Y as one point in ML training data
-    this.inputPositionChanges.push([leftCmd, rightCmd]);
-    this.outputCommands.push([xChange, yChange]);
+    this.inputPositionChanges.push([xChange, yChange]);
+    console.log('ML: Recording input = ' + '[ ' + leftCmd + ', ' + rightCmd + ' ]'); 
+    this.outputCommands.push([leftCmd, rightCmd]);
+    console.log('ML: Recording output = ' + '[ ' + xChange + ', ' + yChange + ' ]'); 
   }
 
   /**
@@ -116,7 +119,7 @@ export class MlService {
     // subtract from start coordinates to get change
     let xChange = endX - startX;
     let yChange = (endY - startY); // negate for weird canvas system
-    console.log('Left speed = ' + leftSpeed + ', rightSpeed = ' + rightSpeed + ', xChange = ' + xChange + ', yChange = ' + yChange);
+    console.log('ML: Left speed = ' + leftSpeed + ', rightSpeed = ' + rightSpeed + ', xChange = ' + xChange + ', yChange = ' + yChange);
     return [xChange, yChange];
   }
 

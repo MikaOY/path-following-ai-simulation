@@ -31,3 +31,9 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 # References
 
 importing JS libraries into Angular apps - https://stackoverflow.com/questions/43476135/angular-4-cannot-find-name-require/43477099 
+
+# TODO
+
+TODO: show bot when exec cmd
+TODO: update bot center pos 
+TODO: add reset bot option

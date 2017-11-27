@@ -193,21 +193,14 @@ export class AppComponent implements OnInit {
 
   /** train ML movement model by plotting command and position change after execution as data point */
   train() {
-    console.log('Training ML model');
-    this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    console.log('TRAINING ML MODEL');
+
+    // get initial and final bot position
     let oldPos = this.getBotPos();
-    this.moveBot(this.leftCmd, this.rightCmd);
-    // let newPos = this.getBotPos();
-    // TODO: temp calculate final pos since actual bot moving not working
-    let translation: number[] = this.mlService.executeMotorCmd(this.leftCmd, this.rightCmd); 
+    let translation: number[] = this.moveBot(this.leftCmd, this.rightCmd);
     let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]]; 
 
     this.mlService.train(this.leftCmd, this.rightCmd, oldPos, newPos);
-    console.log('Recorded inputs = ' + this.mlService.outputCommands.length);
-
-    // TODO: show bot when exec cmd
-    // TODO: update bot center pos 
-    // TODO: add reset bot option
   }
 
   /** get bot's current Cartesian position */
@@ -220,8 +213,8 @@ export class AppComponent implements OnInit {
    * @param {number} - left wheel speed
    * @param {number} - right wheel speed
    */
-  moveBot(leftSpd, rightSpd) {
-    this.drawTravelPath(leftSpd, rightSpd);
+  moveBot(leftSpd, rightSpd): number[] {
+    return this.drawTravelPath(leftSpd, rightSpd);
   }
 
   /** draws the path each bot part will move 
@@ -229,9 +222,7 @@ export class AppComponent implements OnInit {
    * @param {number} - number of revolutions left wheel turns in given time
    * @returns {{x,y}} - change in x and y distance
   */
-  drawTravelPath(leftSpeed: number, rightSpeed: number) {
-    console.log('Left speed = ' + leftSpeed + ', rightSpeed = ' + rightSpeed);
-
+  drawTravelPath(leftSpeed: number, rightSpeed: number): number[] {
     // calculate arc/ path of left wheel, right wheel, and body based on speeds given
     let isCounterClock: boolean;
     let x, y, r, eAngle, xC, yC, slope, arciLength, currAngle: number;
@@ -261,7 +252,8 @@ export class AppComponent implements OnInit {
       this.ctx.stroke();
       return [xChange, yChange];
     }
-    console.log('radius of center arc = ' + r + ', isCounterClock = ' + isCounterClock);
+    console.log('ANI: inner arc radius = ' + r);
+    console.log('ANI: isCounterCLockwise = ' + isCounterClock);
 
     let ri = r - (this.mlService.botWidth / 2); // inner radius
     // slope = (this.y2 - this.y1) / (this.x2 - this.x1);
@@ -274,12 +266,12 @@ export class AppComponent implements OnInit {
     // actual x and y center coordinates
     x = xC + x2;
     y = yC + y2;
-    console.log('actual center coordinates: (' + x + ', ' + y + ')');
+    console.log('ANI: center coordinates: (' + x + ', ' + y + ')');
 
     sAngle = isCounterClock ? Math.PI : 0; // start angle in rad
-    console.log('arcilength = ' + arciLength + ', ri = ' + ri);
+    console.log('ANI: inner arc length = ' + arciLength + ', inner arc radius = ' + ri);
     eAngle = isCounterClock ? Math.PI - (arciLength / ri) : (arciLength / ri); // calc end angle in radians
-    console.log('end angle = ' + eAngle + ' radians');
+    console.log('ANI: end angle = ' + eAngle + ' radians');
 
     // clears canvas and draws ARC
     this.currAngle = 0;
@@ -295,18 +287,18 @@ export class AppComponent implements OnInit {
 
     // angle from origin
     let angle = isCounterClock ? (2 * Math.PI) - eAngle : eAngle - sAngle;
-    console.log('angle from origin = ' + angle);
+    console.log('ANI: counterclockwise angle from origin = ' + angle);
 
     // end position coordinates
     let endX = x + (r * Math.cos(angle));
     let endY = isCounterClock ? y - (r * Math.sin(angle)) : y + (r * Math.sin(angle));
-    console.log('endX = ' + endX + ', endY = ' + endY);
+    console.log('ANI: endingX = ' + endX + ', endingY = ' + endY);
     this.ctx.fillRect(endX, endY, 20, 20);
 
     // subtract from start coordinates to get change
     let xChange = endX - startX;
     let yChange = (endY - startY); // negate for weird canvas system
-    console.log('xChange = ' + xChange + ', yChange = ' + yChange);
+    console.log('ANI: xChange = ' + xChange + ', yChange = ' + yChange);
     return [xChange, yChange];
   }
 
@@ -368,9 +360,9 @@ export class AppComponent implements OnInit {
     this.calculateCleanPoints(); 
     this.cleanPointsArray.forEach(point => {
       let diff: number[] = this.mlService.calculatePosDifference(this.getBotPos(), [point.x, point.y]); 
-      console.log('Point difference: (' + diff[0] + ', ' + diff[1] + ')'); 
+      console.log('PATH: Point difference: (' + diff[0] + ', ' + diff[1] + ')'); 
       let cmd: number[][] = this.mlService.predictCmd(diff[0], diff[1]);
-      console.log('Predicted motor commands: (' + cmd[0][0] + ', ' + cmd[0][1] + ')');  
+      console.log('PATH: Predicted motor commands: (' + cmd[0][0] + ', ' + cmd[0][1] + ')');  
       this.moveBot(cmd[0][0], cmd[0][1]); 
     });
   }
