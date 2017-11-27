@@ -74,7 +74,7 @@ export class AppComponent implements OnInit {
     // path doesn't close until logPoints() called
     this.ctx.beginPath();
 
-    this.drawBot(this.mlService.CONST_BOT_START.x, this.mlService.CONST_BOT_START.y); 
+    this.drawBot(this.mlService.CONST_BOT_START.x, this.mlService.CONST_BOT_START.y);
   }
 
   /**
@@ -154,7 +154,7 @@ export class AppComponent implements OnInit {
     }
 
     // redraw bot
-    this.drawBot(this.mlService.CONST_BOT_START.x, this.mlService.CONST_BOT_START.y); 
+    this.drawBot(this.mlService.CONST_BOT_START.x, this.mlService.CONST_BOT_START.y);
   }
 
   calculateCleanPoints(doDraw?: boolean) {
@@ -207,6 +207,38 @@ export class AppComponent implements OnInit {
     this.mlService.train(this.leftCmd, this.rightCmd, oldPos, newPos);
   }
 
+  /** train with many auto generated points */
+  autoTrain() {
+    console.log('AUTO TRAINING INITIATED');
+
+    // generate commands
+    let ints: number[] = [0.5, 1.5, 2.5, 3.5, 4.5, 5.5];
+    let commands: number[][] = [];
+    for (var index = 0; index < ints.length; index++) {
+      var currentInt = ints[index];
+      // increment x
+      for (var j = 0; j < 1; j += 0.5) {
+        let newGen = 
+        commands.push([currentInt + j, currentInt]);
+      }
+      // increment y
+      for (var j = 0.5; j < 1; j += 0.5) {
+        commands.push([currentInt, currentInt + j]);
+      }
+    }
+    console.log('TRAIN: auto gen commands = ' + commands.toString());
+
+    // train on each command
+    commands.forEach(cmd => {
+      // get initial and final bot position
+      let oldPos = this.getBotPos();
+      let translation: number[] = this.moveBot(cmd[0], cmd[1], true);
+      let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
+
+      this.mlService.train(cmd[0], cmd[1], oldPos, newPos);
+    });
+  }
+
   /** get bot's current Cartesian position */
   getBotPos(): number[] {
     // get coordinates of body center
@@ -217,8 +249,8 @@ export class AppComponent implements OnInit {
    * @param {number} - left wheel speed
    * @param {number} - right wheel speed
    */
-  moveBot(leftSpd, rightSpd): number[] {
-    return this.drawTravelPath(leftSpd, rightSpd);
+  moveBot(leftSpd: number, rightSpd: number, doNotStoreChange?: boolean): number[] {
+    return this.drawTravelPath(leftSpd, rightSpd, doNotStoreChange);
   }
 
   /** draws the path each bot part will move 
@@ -226,7 +258,7 @@ export class AppComponent implements OnInit {
    * @param {number} - number of revolutions left wheel turns in given time
    * @returns {{x,y}} - change in x and y distance
   */
-  drawTravelPath(leftSpeed: number, rightSpeed: number): number[] {
+  drawTravelPath(leftSpeed: number, rightSpeed: number, doNotStoreChange?: boolean): number[] {
     // calculate arc / path of body based on speeds given //
 
     let isCounterClock: boolean;
@@ -249,8 +281,9 @@ export class AppComponent implements OnInit {
       this.ctx.lineTo(this.mlService.botCenter.x, this.mlService.botCenter.y + yChange);
       this.ctx.stroke();
 
-      // update bot center 
+      // update bot center
       this.mlService.botCenter.y += yChange;
+
       return [xChange, yChange];
     }
     console.log('ANI: isCounterCLockwise = ' + isCounterClock);
@@ -273,7 +306,7 @@ export class AppComponent implements OnInit {
     // 3 - find start and end angle
     // TODO: factor angled bot into calc
     this.startAngle = (isCounterClock ? Math.PI : 0) + Math.PI;
-    endAngle = (isCounterClock ? Math.PI - (innerArcLength / innerR) : (innerArcLength / innerR)) + Math.PI; 
+    endAngle = (isCounterClock ? Math.PI - (innerArcLength / innerR) : (innerArcLength / innerR)) + Math.PI;
     console.log('ANI: start angle = ' + this.startAngle + ' radians');
     console.log('ANI: end angle = ' + endAngle + ' radians');
 
@@ -311,6 +344,11 @@ export class AppComponent implements OnInit {
     this.currAngle = 0;
     console.log('ani = ' + startPos.x);
     this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
+
+    // reset if doNotStore true
+    if (doNotStoreChange) {
+      this.mlService.resetBot();
+    }
 
     return [xChange, yChange];
   }
@@ -366,15 +404,15 @@ export class AppComponent implements OnInit {
     // bot end point
     this.ctx.moveTo(0, 0);
     this.ctx.arc(endPos.x, endPos.y, 10, 0, 2 * Math.PI);
-    
+
     // center of path
     this.ctx.moveTo(0, 0); // don't connect circles
     this.ctx.arc(x, y, 5, 0, 2 * Math.PI);
-    
+
     // original starting
     this.ctx.moveTo(0, 0);
-    this.ctx.arc(this.mlService.CONST_BOT_START.x + this.mlService.botWidth/2, 
-      this.mlService.CONST_BOT_START.y - this.mlService.botHeight/2, 10, 0, 2 * Math.PI);
+    this.ctx.arc(this.mlService.CONST_BOT_START.x + this.mlService.botWidth / 2,
+      this.mlService.CONST_BOT_START.y - this.mlService.botHeight / 2, 10, 0, 2 * Math.PI);
     this.ctx.fillStyle = 'red';
     this.ctx.fill();
   }
