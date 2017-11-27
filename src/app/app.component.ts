@@ -260,7 +260,8 @@ export class AppComponent implements OnInit {
 
     // TODO: factor angled bot into calc
     slope = 0; // temp only
-    let botToArcCenterDiffX = isCounterClock ? innerR : -innerR; // only for straight paths
+    // difference to bot center to center
+    let botToArcCenterDiffX = (isCounterClock ? innerR : -innerR) + this.mlService.botWidth / 2; // only for straight paths
     let botToArcCenterDiffY = slope * botToArcCenterDiffX; // always 0 for now
     centerX = botToArcCenterDiffX + this.mlService.botCenter.x;
     centerY = botToArcCenterDiffY + this.mlService.botCenter.y;
@@ -277,8 +278,8 @@ export class AppComponent implements OnInit {
 
     // find start pos of bot (center)
     // TODO: factor in angled bot
-    let startX = (isCounterClock ? centerX - r : centerX + r) + this.mlService.botWidth / 2;
-    let startY = (centerY) - this.mlService.botHeight / 2; // always same as circle center for now
+    let startX = (isCounterClock ? centerX + r : centerX - r);
+    let startY = centerY; // always same as circle center for now
     // draw movement ref points
     this.ctx.strokeStyle = 'black';
     this.ctx.fillStyle = 'orange';
@@ -353,8 +354,9 @@ export class AppComponent implements OnInit {
     }
     
     // draw ref points
-    this.ctx.fillRect(startX - 10, startY + 10, 20, 20);
-    this.ctx.fillRect(x - 5, y + 5, 10, 10);
+    this.ctx.fillRect(startX - 10, startY - 10, 20, 20);
+    this.ctx.fillRect(x - 5, y - 5, 10, 10);
+    this.ctx.fillRect(250, 250, 10, 10);
   }
 
   /* work */
