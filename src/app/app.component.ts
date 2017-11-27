@@ -225,7 +225,7 @@ export class AppComponent implements OnInit {
   drawTravelPath(leftSpeed: number, rightSpeed: number): number[] {
     // calculate arc/ path of body based on speeds given
     let isCounterClock: boolean;
-    let x, y, r, endAngle, centerX, centerY, slope, innerArcLength, currAngle: number;
+    let centerX, centerY, r, endAngle, slope, innerArcLength, currAngle: number;
     let startAngle: number = 0;
 
     // 1 - determine direction of turn if turning; else simply draw straight path
@@ -259,10 +259,10 @@ export class AppComponent implements OnInit {
     // TODO: factor angled bot into calc
     slope = 0; // temp only
     let botToArcCenterDiffX = isCounterClock ? innerR : -innerR; // only for straight paths
-    let botToArcCenterDiffY = centerY = slope * centerX; // always 0 for now
-    x = centerX + this.mlService.botCenter.x;
-    y = centerY + this.mlService.botCenter.y;
-    console.log('ANI: arc center coordinates: (' + x + ', ' + y + ')');
+    let botToArcCenterDiffY = slope * botToArcCenterDiffX; // always 0 for now
+    centerX = botToArcCenterDiffX + this.mlService.botCenter.x;
+    centerY = botToArcCenterDiffY + this.mlService.botCenter.y;
+    console.log('ANI: arc center coordinates: (' + centerX + ', ' + centerY + ')');
 
     // TODO: factor angled bot into calc
     startAngle = isCounterClock ? Math.PI : 0; // start angle in rad
@@ -270,32 +270,36 @@ export class AppComponent implements OnInit {
     console.log('ANI: start angle = ' + startAngle + ' radians');
     console.log('ANI: end angle = ' + endAngle + ' radians');
 
-    // clears canvas and draws ARC
+    // clears canvas and draws arc
     this.currAngle = 0;
-    this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock);
+    this.animateBotAlongPath(centerX, centerY, r, startAngle, endAngle, isCounterClock);
 
-    // END HERE
+    // find translation caused by motor movement
 
-    // find change in x and y from center of bot
-    // start pos of bot center
-    let startX = isCounterClock ? x - r : x + r; // doesn't account for non-straight bots
-    let startY = y; // always same as circle center for now
-    this.ctx.fillRect(startX, startY, 20, 20);
-    this.ctx.fillRect(x, y, 10, 10);
+    // find start pos of bot (center)
+    // TODO: factor in angled bot
+    let startX = isCounterClock ? centerX - r : centerX + r; 
+    let startY = centerY; // always same as circle center for now
+    // draw movement ref points
+    this.ctx.strokeStyle = 'black';
+    this.ctx.fillStyle = 'orange';
+    // TODO: does not draw it, put in animate func
+    this.ctx.fillRect(startX - 10, startY + 10, 20, 20);
+    this.ctx.fillRect(centerX, centerY, 10, 10);
 
-    // angle from origin
+    // find angle from origin
     let angle = isCounterClock ? (2 * Math.PI) - endAngle : endAngle - startAngle;
     console.log('ANI: counterclockwise angle from origin = ' + angle);
 
     // end position coordinates
-    let endX = x + (r * Math.cos(angle));
-    let endY = isCounterClock ? y - (r * Math.sin(angle)) : y + (r * Math.sin(angle));
+    let endX = centerX + (r * Math.cos(angle));
+    let endY = isCounterClock ? centerY - (r * Math.sin(angle)) : centerY + (r * Math.sin(angle));
     console.log('ANI: endingX = ' + endX + ', endingY = ' + endY);
     this.ctx.fillRect(endX, endY, 20, 20);
 
     // subtract from start coordinates to get change
     let xChange = endX - startX;
-    let yChange = (endY - startY); // negate for weird canvas system
+    let yChange = (endY - startY); 
     console.log('ANI: xChange = ' + xChange + ', yChange = ' + yChange);
     return [xChange, yChange];
   }
