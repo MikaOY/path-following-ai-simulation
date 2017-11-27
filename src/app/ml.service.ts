@@ -149,4 +149,14 @@ export class MlService {
       console.error('Regression model undefined, cannot make prediction!'); 
     }
   }
+
+  /**
+   * Resets stored position to original
+   */
+  resetBot() {
+    this.botStart.x = 250;
+    this.botStart.y = 250;
+    this.botCenter.x = this.botStart.x + (this.botWidth / 2);
+    this.botCenter.y = this.botStart.y - (this.botHeight / 2);
+  }
 }

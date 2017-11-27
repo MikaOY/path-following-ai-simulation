@@ -150,6 +150,7 @@ export class AppComponent implements OnInit {
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.pointsArray = [];
       this.cleanPointsArray = [];
+      this.mlService.resetBot();
     }
 
     // redraw bot
@@ -262,8 +263,9 @@ export class AppComponent implements OnInit {
     // TODO: factor angled bot into calc
     slope = 0; // temp only
     // difference to bot center to center
-    let botToArcCenterDiffX = (isCounterClock ? innerR : -innerR) + this.mlService.botWidth / 2; // only for straight paths
+    let botToArcCenterDiffX = isCounterClock ? -r : r; // only for straight paths
     let botToArcCenterDiffY = slope * botToArcCenterDiffX; // always 0 for now
+    console.log('startBotCenter = (' + this.mlService.botCenter.x + ', ' + this.mlService.botCenter.y + ')');
     centerX = botToArcCenterDiffX + this.mlService.botCenter.x;
     centerY = botToArcCenterDiffY + this.mlService.botCenter.y;
     console.log('ANI: arc center coordinates: (' + centerX + ', ' + centerY + ')');
