@@ -304,7 +304,7 @@ export class AppComponent implements OnInit {
     // clear canvas and draw movement path //
 
     this.currAngle = 0;
-    this.animateBotAlongPath(centerX, centerY, r, startAngle, endAngle, isCounterClock, startX, startY);
+    this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startX, startY);
 
     return [xChange, yChange];
   }
