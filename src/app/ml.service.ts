@@ -9,8 +9,9 @@ export class MlService {
   public wheelRadius: number = (50 / Math.PI); // ~1.6, circumference 10
   public botWidth: number = 50 // width between wheels in px 
   public botHeight: number = 40
-  public botStart: { x: number, y: number } = { x: 250, y: 250 };
-  public botCenter: { x: number, y: number } = { x: this.botStart.x + (this.botWidth / 2), y: this.botStart.y - (this.botHeight / 2) };
+  public CONST_BOT_START: { x: number, y: number } = { x: 275, y: 300 };
+  public CONST_BOT_CENTER: { x: number, y: number } = { x: this.CONST_BOT_START.x + (this.botWidth / 2), y: this.CONST_BOT_START.y - (this.botHeight / 2) };
+  public botCenter: { x: number, y: number } = this.CONST_BOT_CENTER; 
   public timeUnit: number = 1 // number of seconds wheel rotation takes to complete 
 
   // service properties
@@ -154,9 +155,9 @@ export class MlService {
    * Resets stored position to original
    */
   resetBot() {
-    this.botStart.x = 250;
-    this.botStart.y = 250;
-    this.botCenter.x = this.botStart.x + (this.botWidth / 2);
-    this.botCenter.y = this.botStart.y - (this.botHeight / 2);
+    this.CONST_BOT_START.x = 250;
+    this.CONST_BOT_START.y = 250;
+    this.botCenter.x = this.CONST_BOT_START.x + (this.botWidth / 2);
+    this.botCenter.y = this.CONST_BOT_START.y - (this.botHeight / 2);
   }
 }

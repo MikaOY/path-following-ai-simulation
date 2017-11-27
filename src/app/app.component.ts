@@ -74,7 +74,7 @@ export class AppComponent implements OnInit {
     // path doesn't close until logPoints() called
     this.ctx.beginPath();
 
-    this.drawBot(250, 250); 
+    this.drawBot(this.mlService.CONST_BOT_START.x, this.mlService.CONST_BOT_START.y); 
   }
 
   /**
@@ -85,8 +85,8 @@ export class AppComponent implements OnInit {
   drawBot(x, y) {
     this.ctx.strokeStyle = 'black';
     this.ctx.fillStyle = 'orange';
-    let startX = this.mlService.botStart.x;
-    let startY = this.mlService.botStart.y;
+    let startX = this.mlService.CONST_BOT_START.x;
+    let startY = this.mlService.CONST_BOT_START.y;
     let width = this.mlService.botWidth;
     let height = this.mlService.botHeight;
 
@@ -154,7 +154,7 @@ export class AppComponent implements OnInit {
     }
 
     // redraw bot
-    this.drawBot(250, 250);
+    this.drawBot(this.mlService.CONST_BOT_START.x, this.mlService.CONST_BOT_START.y); 
   }
 
   calculateCleanPoints(doDraw?: boolean) {
@@ -367,7 +367,8 @@ export class AppComponent implements OnInit {
     
     // original starting
     this.ctx.moveTo(0, 0);
-    this.ctx.arc(250 + this.mlService.botWidth/2, 250 - this.mlService.botHeight/2, 10, 0, 2 * Math.PI);
+    this.ctx.arc(this.mlService.CONST_BOT_START.x + this.mlService.botWidth/2, 
+      this.mlService.CONST_BOT_START.y - this.mlService.botHeight/2, 10, 0, 2 * Math.PI);
     this.ctx.fillStyle = 'red';
     this.ctx.fill();
   }
