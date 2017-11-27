@@ -96,6 +96,7 @@ export class AppComponent implements OnInit {
     this.ctx.lineTo(startX + 10, startY - (height - 10));
     this.ctx.lineTo(startX + width, startY);
     this.ctx.fill();
+    this.ctx.closePath();
   }
 
   /* path-drawing */
@@ -268,7 +269,7 @@ export class AppComponent implements OnInit {
     // 3 - find start and end angle
     // TODO: factor angled bot into calc
     startAngle = (isCounterClock ? Math.PI : 0) + Math.PI;
-    endAngle = (isCounterClock ? Math.PI - (innerArcLength / innerR) : (innerArcLength / innerR)) + Math.PI; 
+    endAngle = (isCounterClock ? Math.PI - (innerArcLength / innerR) : (innerArcLength / innerR)) + Math.PI;
     console.log('ANI: start angle = ' + startAngle + ' radians');
     console.log('ANI: end angle = ' + endAngle + ' radians');
 
@@ -350,10 +351,15 @@ export class AppComponent implements OnInit {
         });
       }
     }
-    
+
     // draw ref points
-    this.ctx.fillRect(startX - 10, startY + 10, 20, 20);
-    this.ctx.fillRect(x - 5, y + 5, 10, 10);
+    // bot start point
+    this.ctx.beginPath();
+    this.ctx.arc(startX, startY, 10, 0, 2 * Math.PI);
+    // center of path
+    this.ctx.arc(x, y, 5, 0, 2 * Math.PI);
+    this.ctx.fillStyle = 'red';
+    this.ctx.fill();
   }
 
   /* work */
