@@ -288,12 +288,12 @@ export class AppComponent implements OnInit {
     this.ctx.fillStyle = 'orange';
 
     // find angle from origin
-    let angle = isCounterClock ? (2 * Math.PI) - endAngle : endAngle - this.startAngle;
+    let angle = isCounterClock ? (2 * Math.PI) - endAngle : (2 * Math.PI) - endAngle;
     console.log('ANI: counterclockwise angle from origin = ' + angle);
 
     // end position coordinates
     let endX = centerX + (r * Math.cos(angle));
-    let endY = isCounterClock ? centerY - (r * Math.sin(angle)) : centerY + (r * Math.sin(angle));
+    let endY = isCounterClock ? centerY - (r * Math.sin(angle)) : centerY - (r * Math.sin(angle));
     console.log('ANI: endingX = ' + endX + ', endingY = ' + endY);
     this.ctx.fillRect(endX, endY, 20, 20);
 
@@ -306,8 +306,8 @@ export class AppComponent implements OnInit {
     this.mlService.botCenter.y += yChange;
 
     // clear canvas and draw movement path //
-    let startPos: {x: number, y: number} = {x: startX, y: startY};
-    let endPos: {x: number, y: number} = {x: endX, y: endY};
+    let startPos: { x: number, y: number } = { x: startX, y: startY };
+    let endPos: { x: number, y: number } = { x: endX, y: endY };
     this.currAngle = 0;
     console.log('ani = ' + startPos.x);
     this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
