@@ -306,7 +306,7 @@ export class AppComponent implements OnInit {
     console.log('ANI: arc center coordinates: (' + centerX + ', ' + centerY + ')');
 
     // 3 - find start and end angle
-    this.startAngle = isCounterClock ? (this.mlService.botAngle - Math.PI / 2) : (this.mlService.botAngle + Math.PI / 2);
+    this.startAngle = (2 * Math.PI) - (isCounterClock ? (this.mlService.botAngle - Math.PI / 2) : (this.mlService.botAngle + Math.PI / 2));
     endAngle = (isCounterClock ? this.startAngle - (innerArcLength / innerR) : this.startAngle + (innerArcLength / innerR));
    
     console.log('ANI: start angle = ' + this.startAngle + ' radians, end angle = ' + endAngle + ' radians');
