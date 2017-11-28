@@ -318,7 +318,7 @@ export class AppComponent implements OnInit {
     let startY = this.mlService.botCenter.y;
 
     // find angle from origin
-    let angle = isCounterClock ? (2 * Math.PI) - endAngle : (2 * Math.PI) - endAngle;
+    let angle = (2 * Math.PI) - endAngle;
     console.log('ANI: counterclockwise angle from origin = ' + angle);
 
     // end position coordinates
@@ -339,7 +339,6 @@ export class AppComponent implements OnInit {
     let startPos: { x: number, y: number } = { x: startX, y: startY };
     let endPos: { x: number, y: number } = { x: endX, y: endY };
     this.currAngle = 0;
-    console.log('ani = ' + startPos.x);
     this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
 
     // reset if doNotStore true
@@ -376,6 +375,7 @@ export class AppComponent implements OnInit {
     this.ctx.stroke();
     // Increment percent
     if (isCounterClock) {
+      startAngle = startAngle == 0 ? 2 * Math.PI : startAngle;
       this.currAngle -= 0.1;
       if (startAngle + this.currAngle > endAngle) {
         // Recursive repeat this function until the end is reached
