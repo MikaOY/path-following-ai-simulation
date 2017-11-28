@@ -266,10 +266,10 @@ export class AppComponent implements OnInit {
 
     // 1 - determine direction of turn if turning; else simply draw straight path
     if (leftSpeed > rightSpeed) {
-      isCounterClock = false;
+      isCounterClock = true;
       innerArcLength = rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else if (leftSpeed < rightSpeed) {
-      isCounterClock = true;
+      isCounterClock = false;
       innerArcLength = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else {
       // travel in straight line
@@ -295,31 +295,26 @@ export class AppComponent implements OnInit {
     console.log('ANI: inner arc length = ' + innerArcLength + ', inner arc radius = ' + innerR);
 
     // difference to bot center to center
-    let arcCenterPolarAngleDiff = leftSpeed > rightSpeed ? (this.mlService.botAngle - Math.PI) : (this.mlService.botAngle + Math.PI);
-    let botToArcCenterDiffX = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit
-      * Math.cos(arcCenterPolarAngleDiff);
-    let botToArcCenterDiffY = -(rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit
-      * Math.cos(arcCenterPolarAngleDiff));
+    let arcCenterPolarAngleDiff = leftSpeed > rightSpeed ? (this.mlService.botAngle - Math.PI / 2) : (this.mlService.botAngle + Math.PI / 2);
+    let botToArcCenterDiffX = -(r * Math.cos(arcCenterPolarAngleDiff));
+    let botToArcCenterDiffY = -(r * Math.sin(arcCenterPolarAngleDiff));
+    console.log('ANI: arcCenterPolarAngleDiff = ' + arcCenterPolarAngleDiff);
     console.log('ANI: starting botCenter = (' + this.mlService.botCenter.x + ', ' + this.mlService.botCenter.y + ')');
     centerX = botToArcCenterDiffX + this.mlService.botCenter.x;
     centerY = botToArcCenterDiffY + this.mlService.botCenter.y;
     console.log('ANI: arc center coordinates: (' + centerX + ', ' + centerY + ')');
 
     // 3 - find start and end angle
-    this.startAngle = leftSpeed > rightSpeed ? (this.mlService.botAngle + Math.PI / 2) : (this.mlService.botAngle - Math.PI / 2);
-    endAngle = (leftSpeed > rightSpeed ? this.startAngle - (innerArcLength / innerR) : this.startAngle + (innerArcLength / innerR));
+    this.startAngle = leftSpeed > rightSpeed ? (this.mlService.botAngle - Math.PI / 2) : (this.mlService.botAngle + Math.PI / 2);
+    endAngle = (2 * Math.PI) - (leftSpeed > rightSpeed ? this.startAngle + (innerArcLength / innerR) : this.startAngle - (innerArcLength / innerR));
     console.log('ANI: start angle = ' + this.startAngle + ' radians');
     console.log('ANI: end angle = ' + endAngle + ' radians');
 
     // find translation caused by motor movement //
 
     // find start pos of bot (center)
-    // TODO: factor in angled bot
-    let startX = (isCounterClock ? centerX + r : centerX - r);
-    let startY = centerY; // always same as circle center for now
-    // draw movement ref points
-    this.ctx.strokeStyle = 'black';
-    this.ctx.fillStyle = 'orange';
+    let startX = this.mlService.botCenter.x;
+    let startY = this.mlService.botCenter.y;
 
     // find angle from origin
     let angle = isCounterClock ? (2 * Math.PI) - endAngle : (2 * Math.PI) - endAngle;
@@ -400,22 +395,23 @@ export class AppComponent implements OnInit {
     // draw ref points
     // bot start point
     this.ctx.beginPath();
+    this.ctx.fillStyle = 'orange';
+    this.ctx.strokeStyle = 'black';
     this.ctx.arc(startPos.x, startPos.y, 10, 0, 2 * Math.PI);
-
-    // bot end point
-    this.ctx.moveTo(0, 0);
-    this.ctx.arc(endPos.x, endPos.y, 10, 0, 2 * Math.PI);
-
-    // center of path
-    this.ctx.moveTo(0, 0); // don't connect circles
-    this.ctx.arc(x, y, 5, 0, 2 * Math.PI);
-
-    // original starting
-    this.ctx.moveTo(0, 0);
-    this.ctx.arc(this.mlService.CONST_BOT_START.x + this.mlService.botWidth / 2,
-      this.mlService.CONST_BOT_START.y - this.mlService.botHeight / 2, 10, 0, 2 * Math.PI);
-    this.ctx.fillStyle = 'red';
     this.ctx.fill();
+    // bot end point
+    this.ctx.beginPath();
+    this.ctx.fillStyle = 'red';
+    this.ctx.strokeStyle = 'black';
+    this.ctx.arc(endPos.x, endPos.y, 10, 0, 2 * Math.PI);
+    this.ctx.fill();
+    // center of path
+    this.ctx.beginPath();
+    this.ctx.fillStyle = 'green';
+    this.ctx.strokeStyle = 'black';
+    this.ctx.arc(x, y, 15, 0, 1.2 * Math.PI);
+    this.ctx.fill();
+    this.ctx.closePath();
   }
 
   /* work */
