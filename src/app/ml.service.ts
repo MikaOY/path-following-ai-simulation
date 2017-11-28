@@ -11,6 +11,8 @@ export class MlService {
   public botHeight: number = 40
   public CONST_BOT_START: { x: number, y: number } = { x: 275, y: 300 };
   public CONST_BOT_CENTER: { x: number, y: number } = { x: this.CONST_BOT_START.x + (this.botWidth / 2), y: this.CONST_BOT_START.y - (this.botHeight / 2) };
+  public CONST_BOT_ANGLE = Math.PI / 2;
+  public botAngle = this.CONST_BOT_ANGLE; 
   public botCenter: { x: number, y: number } = this.CONST_BOT_CENTER; 
   public timeUnit: number = 1 // number of seconds wheel rotation takes to complete 
 

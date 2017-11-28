@@ -218,8 +218,8 @@ export class AppComponent implements OnInit {
       var currentInt = ints[index];
       // increment x
       for (var j = 0; j < 1; j += 0.5) {
-        let newGen = 
-        commands.push([currentInt + j, currentInt]);
+        let newGen =
+          commands.push([currentInt + j, currentInt]);
       }
       // increment y
       for (var j = 0.5; j < 1; j += 0.5) {
@@ -262,7 +262,7 @@ export class AppComponent implements OnInit {
     // calculate arc / path of body based on speeds given //
 
     let isCounterClock: boolean;
-    let centerX, centerY, r, endAngle, slope, innerArcLength, currAngle: number;
+    let centerX, centerY, r, endAngle, innerArcLength, currAngle: number;
 
     // 1 - determine direction of turn if turning; else simply draw straight path
     if (leftSpeed > rightSpeed) {
@@ -273,8 +273,9 @@ export class AppComponent implements OnInit {
       innerArcLength = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else {
       // travel in straight line
-      let xChange = 0;
-      let yChange = -(leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit);
+      let d: number = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
+      let xChange = d * Math.cos(this.mlService.botAngle);
+      let yChange = -(d * Math.sin(this.mlService.botAngle)); // negated because y positive is down
       // draw line 
       this.ctx.beginPath();
       this.ctx.moveTo(this.mlService.botCenter.x, this.mlService.botCenter.y);
@@ -293,20 +294,20 @@ export class AppComponent implements OnInit {
     let innerR = r - (this.mlService.botWidth / 2);
     console.log('ANI: inner arc length = ' + innerArcLength + ', inner arc radius = ' + innerR);
 
-    // TODO: factor angled bot into calc
-    slope = 0; // temp only
     // difference to bot center to center
-    let botToArcCenterDiffX = isCounterClock ? -r : r; // only for straight paths
-    let botToArcCenterDiffY = slope * botToArcCenterDiffX; // always 0 for now
-    console.log('ANI: startBotCenter = (' + this.mlService.botCenter.x + ', ' + this.mlService.botCenter.y + ')');
+    let arcCenterPolarAngleDiff = leftSpeed > rightSpeed ? (this.mlService.botAngle - Math.PI) : (this.mlService.botAngle + Math.PI);
+    let botToArcCenterDiffX = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit
+      * Math.cos(arcCenterPolarAngleDiff);
+    let botToArcCenterDiffY = -(rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit
+      * Math.cos(arcCenterPolarAngleDiff));
+    console.log('ANI: starting botCenter = (' + this.mlService.botCenter.x + ', ' + this.mlService.botCenter.y + ')');
     centerX = botToArcCenterDiffX + this.mlService.botCenter.x;
     centerY = botToArcCenterDiffY + this.mlService.botCenter.y;
     console.log('ANI: arc center coordinates: (' + centerX + ', ' + centerY + ')');
 
     // 3 - find start and end angle
-    // TODO: factor angled bot into calc
-    this.startAngle = (isCounterClock ? Math.PI : 0) + Math.PI;
-    endAngle = (isCounterClock ? Math.PI - (innerArcLength / innerR) : (innerArcLength / innerR)) + Math.PI;
+    this.startAngle = leftSpeed > rightSpeed ? (this.mlService.botAngle + Math.PI / 2) : (this.mlService.botAngle - Math.PI / 2);
+    endAngle = (leftSpeed > rightSpeed ? this.startAngle - (innerArcLength / innerR) : this.startAngle + (innerArcLength / innerR));
     console.log('ANI: start angle = ' + this.startAngle + ' radians');
     console.log('ANI: end angle = ' + endAngle + ' radians');
 
