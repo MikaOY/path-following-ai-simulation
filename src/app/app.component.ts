@@ -308,10 +308,9 @@ export class AppComponent implements OnInit {
     // 3 - find start and end angle
     this.startAngle = isCounterClock ? (this.mlService.botAngle - Math.PI / 2) : (this.mlService.botAngle + Math.PI / 2);
     endAngle = (isCounterClock ? this.startAngle - (innerArcLength / innerR) : this.startAngle + (innerArcLength / innerR));
-    // set botAngle depending on direction facing
-    this.mlService.botAngle = isCounterClock ? endAngle + (Math.PI / 2) : endAngle - (Math.PI / 2);
+   
     console.log('ANI: start angle = ' + this.startAngle + ' radians, end angle = ' + endAngle + ' radians');
-    console.log('ANI: botAngle = ' + this.mlService.botAngle);
+
 
     // find translation caused by motor movement //
 
@@ -322,6 +321,9 @@ export class AppComponent implements OnInit {
     // find angle from origin
     let angle = (2 * Math.PI) - endAngle;
     console.log('ANI: counterclockwise angle from origin = ' + angle);
+     // set botAngle depending on direction facing
+    this.mlService.botAngle = isCounterClock ? angle + (Math.PI / 2) : angle - (Math.PI / 2);
+    console.log('ANI: botAngle = ' + this.mlService.botAngle);
 
     // end position coordinates
     let endX = centerX + (r * Math.cos(angle));
