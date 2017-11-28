@@ -150,6 +150,7 @@ export class AppComponent implements OnInit {
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.pointsArray = [];
       this.cleanPointsArray = [];
+      this.startAngle = 0;
       this.mlService.resetBot();
     }
 
@@ -266,10 +267,10 @@ export class AppComponent implements OnInit {
 
     // 1 - determine direction of turn if turning; else simply draw straight path
     if (leftSpeed > rightSpeed) {
-      isCounterClock = true;
+      isCounterClock = false;
       innerArcLength = rightSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else if (leftSpeed < rightSpeed) {
-      isCounterClock = false;
+      isCounterClock = true;
       innerArcLength = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
     } else {
       // travel in straight line
@@ -295,8 +296,8 @@ export class AppComponent implements OnInit {
     console.log('ANI: inner arc length = ' + innerArcLength + ', inner arc radius = ' + innerR);
 
     // difference to bot center to center
-    let arcCenterPolarAngleDiff = leftSpeed > rightSpeed ? (this.mlService.botAngle - Math.PI / 2) : (this.mlService.botAngle + Math.PI / 2);
-    let botToArcCenterDiffX = -(r * Math.cos(arcCenterPolarAngleDiff));
+    let arcCenterPolarAngleDiff = isCounterClock ? (this.mlService.botAngle + Math.PI / 2) : (this.mlService.botAngle - Math.PI / 2);
+    let botToArcCenterDiffX = (r * Math.cos(arcCenterPolarAngleDiff));
     let botToArcCenterDiffY = -(r * Math.sin(arcCenterPolarAngleDiff));
     console.log('ANI: arcCenterPolarAngleDiff = ' + arcCenterPolarAngleDiff);
     console.log('ANI: starting botCenter = (' + this.mlService.botCenter.x + ', ' + this.mlService.botCenter.y + ')');
@@ -305,10 +306,11 @@ export class AppComponent implements OnInit {
     console.log('ANI: arc center coordinates: (' + centerX + ', ' + centerY + ')');
 
     // 3 - find start and end angle
-    this.startAngle = leftSpeed > rightSpeed ? (this.mlService.botAngle - Math.PI / 2) : (this.mlService.botAngle + Math.PI / 2);
-    endAngle = (2 * Math.PI) - (leftSpeed > rightSpeed ? this.startAngle + (innerArcLength / innerR) : this.startAngle - (innerArcLength / innerR));
-    console.log('ANI: start angle = ' + this.startAngle + ' radians');
-    console.log('ANI: end angle = ' + endAngle + ' radians');
+    this.startAngle = (2 * Math.PI) - (isCounterClock ? (this.mlService.botAngle - Math.PI / 2) : (this.mlService.botAngle + Math.PI / 2));
+    endAngle = (isCounterClock ? this.startAngle - (innerArcLength / innerR) : this.startAngle + (innerArcLength / innerR));
+   
+    console.log('ANI: start angle = ' + this.startAngle + ' radians, end angle = ' + endAngle + ' radians');
+
 
     // find translation caused by motor movement //
 
@@ -317,8 +319,11 @@ export class AppComponent implements OnInit {
     let startY = this.mlService.botCenter.y;
 
     // find angle from origin
-    let angle = isCounterClock ? (2 * Math.PI) - endAngle : (2 * Math.PI) - endAngle;
+    let angle = (2 * Math.PI) - endAngle;
     console.log('ANI: counterclockwise angle from origin = ' + angle);
+     // set botAngle depending on direction facing
+    this.mlService.botAngle = isCounterClock ? angle + (Math.PI / 2) : angle - (Math.PI / 2);
+    console.log('ANI: botAngle = ' + this.mlService.botAngle);
 
     // end position coordinates
     let endX = centerX + (r * Math.cos(angle));
@@ -338,7 +343,6 @@ export class AppComponent implements OnInit {
     let startPos: { x: number, y: number } = { x: startX, y: startY };
     let endPos: { x: number, y: number } = { x: endX, y: endY };
     this.currAngle = 0;
-    console.log('ani = ' + startPos.x);
     this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
 
     // reset if doNotStore true
