@@ -150,6 +150,7 @@ export class AppComponent implements OnInit {
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.pointsArray = [];
       this.cleanPointsArray = [];
+      this.startAngle = 0;
       this.mlService.resetBot();
     }
 
