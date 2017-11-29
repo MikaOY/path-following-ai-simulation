@@ -74,7 +74,7 @@ export class AppComponent implements OnInit {
     // path doesn't close until logPoints() called
     this.ctx.beginPath();
 
-    this.drawBot(0, this.mlService.CONST_BOT_START.x, this.mlService.CONST_BOT_START.y);
+    this.drawBot(0, this.mlService.CONST_BOT_CENTER.x, this.mlService.CONST_BOT_CENTER.y);
   }
 
   /**
@@ -94,7 +94,7 @@ export class AppComponent implements OnInit {
     let height = this.mlService.botHeight;
     let startX = 0 - width / 2; // offset to make it at center
     let startY = 0 + height / 2;
-    
+
     // draw bot
     this.ctx.beginPath();
     this.ctx.moveTo(startX, startY);
@@ -105,7 +105,7 @@ export class AppComponent implements OnInit {
     this.ctx.lineTo(startX + width, startY);
     this.ctx.fill();
     this.ctx.closePath();
-    
+
     // reset transform matrix
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
@@ -156,15 +156,14 @@ export class AppComponent implements OnInit {
   reset() {
     var m = confirm("Are you sure you want to reset bot and clear path?");
     if (m) {
-      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.pointsArray = [];
       this.cleanPointsArray = [];
       this.startAngle = 0;
       this.mlService.resetBot();
+      // reset visuals
+      this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);      
+      this.drawBot(0, this.mlService.CONST_BOT_CENTER.x, this.mlService.CONST_BOT_CENTER.y);
     }
-
-    // redraw bot
-    this.drawBot(0, this.mlService.CONST_BOT_START.x, this.mlService.CONST_BOT_START.y);
   }
 
   calculateCleanPoints(doDraw?: boolean) {
@@ -328,7 +327,7 @@ export class AppComponent implements OnInit {
     // find angle from origin
     let angle = (2 * Math.PI) - endAngle;
     console.log('ANI: counterclockwise angle from origin = ' + angle);
-     // set botAngle depending on direction facing
+    // set botAngle depending on direction facing
     this.mlService.botAngle = isCounterClock ? angle + (Math.PI / 2) : angle - (Math.PI / 2);
     console.log('ANI: botAngle = ' + this.mlService.botAngle);
 
@@ -392,7 +391,7 @@ export class AppComponent implements OnInit {
         window.requestAnimationFrame(() => {
           this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
         });
-      } else { 
+      } else {
         // draw bot when finished
         this.endAnimation(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
       }
@@ -434,7 +433,6 @@ export class AppComponent implements OnInit {
     // draw the bot
     this.drawBot(endAngle, endPos.x, endPos.y);
   }
-  
 
   /* work */
 
@@ -447,7 +445,7 @@ export class AppComponent implements OnInit {
       console.log('PATH: Point difference: (' + diff[0] + ', ' + diff[1] + ')');
       let cmd: number[][] = this.mlService.predictCmd(diff[0], diff[1]);
       console.log('PATH: Predicted motor commands: (' + cmd[0][0] + ', ' + cmd[0][1] + ')');
-      this.moveBot(cmd[0][0], cmd[0][1]);
+      this.moveBot(cmd[0][0], cmd[0][1], true);
     });
   }
 }

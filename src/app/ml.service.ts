@@ -10,7 +10,7 @@ export class MlService {
   public botWidth: number = 50 // width between wheels in px 
   public botHeight: number = 40
   public CONST_BOT_START: { x: number, y: number } = { x: 275, y: 300 };
-  private CONST_BOT_CENTER: { x: number, y: number } = { x: this.CONST_BOT_START.x + (this.botWidth / 2), y: this.CONST_BOT_START.y - (this.botHeight / 2) };
+  public CONST_BOT_CENTER: { x: number, y: number } = { x: this.CONST_BOT_START.x + (this.botWidth / 2), y: this.CONST_BOT_START.y - (this.botHeight / 2) };
   public CONST_BOT_ANGLE = Math.PI / 2;
   public botAngle = this.CONST_BOT_ANGLE; // direction bot is facing in, counterclock from origin
   public botCenter: { x: number, y: number } = this.CONST_BOT_CENTER; 
