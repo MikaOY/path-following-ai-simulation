@@ -301,8 +301,11 @@ export class AppComponent implements OnInit {
       let xChange = d * Math.cos(this.mlService.botAngle);
       let yChange = -(d * Math.sin(this.mlService.botAngle)); // negated because y positive is down
       if (!skipAni) {
+        let endX = this.mlService.botCenter.x + xChange;
+        let endY = this.mlService.botCenter.y + yChange;
+
         this.animateBotAlongLine(this.mlService.botCenter.x, this.mlService.botCenter.y, 
-          xChange, yChange)
+          xChange, yChange);
       }
       
       // update bot center
@@ -367,9 +370,6 @@ export class AppComponent implements OnInit {
     if (skipAni) {
       
     } else {
-      // store arc
-      this.pathsArray.push({ isArc: true, x: centerX, y: centerY, r: r, startAngle: this.startAngle, 
-      endAngle: endAngle, isCounterClock: isCounterClock});
       this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
     }
     
@@ -381,8 +381,20 @@ export class AppComponent implements OnInit {
     return [xChange, yChange];
   }
 
-  storePath() {
-
+  drawStoredPaths() {
+    this.pathsArray.forEach((path) => {
+      if (path.isArc) { // draw arc
+        this.ctx.beginPath();
+        this.ctx.arc(path.x, path.y, path.r, path.startAngle, path.endAngle, path.isCounterClock);
+        this.ctx.stroke();
+      } else { // draw line
+        this.ctx.beginPath();
+        this.ctx.moveTo(path.x, path.y);
+        // for lines, r = endX and startAngle = endY
+        this.ctx.lineTo(path.r, path.startAngle);
+        this.ctx.stroke();
+      }
+    });
   }
 
   /** 
@@ -400,22 +412,26 @@ export class AppComponent implements OnInit {
 
   animateBotAlongLine(startX, startY, changeX, changeY) {
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+      this.drawStoredPaths();
 
       // draw line 
       this.ctx.beginPath();
       this.ctx.moveTo(startX, startY);
       this.ctx.lineTo(startX + (changeX * this.currLinePercent), startY + (changeY * this.currLinePercent));
       this.ctx.stroke();
-      this.currLinePercent += 0.01;
+      this.currLinePercent += 0.04; // controls speed
+      // keep looping until 100%
       if (this.currLinePercent < 1) {
         window.requestAnimationFrame(() => {
           this.animateBotAlongLine(startX, startY, changeX, changeY);
         });
-      } else {
+      } else { // end the animation when done
         let startPos = { x: startX, y: startY };
         let endPos = { x: startX + changeX, y: startY + changeY };
-        console.log(this.mlService.botAngle + ' sfasdf');
         this.endAnimation((Math.PI / 2) - this.mlService.botAngle, startPos, endPos);
+        // store line
+        this.pathsArray.push({ isArc: false, x: startPos.x, y: startPos.y, 
+          r: endPos.x, startAngle: endPos.y, endAngle: undefined, isCounterClock: undefined});
         this.currLinePercent = 0;
       }
   } 
@@ -425,6 +441,8 @@ export class AppComponent implements OnInit {
     // get path (stored as properties) and animate left wheel, right wheel, and body along them
     // Clear off the canvas
     this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+
+    this.drawStoredPaths();
     // Start over
     this.ctx.beginPath();
     // Re-draw from the very beginning each time so there isn't tiny line spaces between each section 
@@ -440,8 +458,10 @@ export class AppComponent implements OnInit {
           this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
         });
       } else {
+        // store in array
+        this.pathsArray.push({ isArc: true, x: x, y: y, r: r, startAngle: startAngle, 
+          endAngle: endAngle, isCounterClock: isCounterClock});
         // draw bot when finished
-        console.log(endAngle + ' le bot angle i think');
         this.endAnimation(endAngle, startPos, endPos, x, y);
       }
     } else {
@@ -452,6 +472,9 @@ export class AppComponent implements OnInit {
           this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
         });
       } else {
+        // store in array
+        this.pathsArray.push({ isArc: true, x: x, y: y, r: r, startAngle: startAngle, 
+          endAngle: endAngle, isCounterClock: isCounterClock});
         // flip bot in other direction :}
         this.endAnimation(endAngle - Math.PI, startPos, endPos, x, y);
       }
