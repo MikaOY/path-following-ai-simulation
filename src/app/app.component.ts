@@ -22,8 +22,8 @@ export class AppComponent implements OnInit {
   y = 2;
   canvasWidth: number;
   canvasHeight: number;
-  currAngle: number = 0;
-  startAngle: number = 0;
+  currAngle: number = 0; // number added/subtracted for animation purposes
+  startAngle: number = 0; // clockwise angle from origin to start 
   // training //
   leftCmd: number;
   rightCmd: number;
