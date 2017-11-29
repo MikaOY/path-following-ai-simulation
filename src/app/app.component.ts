@@ -153,12 +153,16 @@ export class AppComponent implements OnInit {
     this.pointsArray.push({ x: this.prevX, y: this.prevY });
   }
 
-  reset() {
-    var m = confirm("Are you sure you want to reset bot and clear path?");
-    if (m) {
+  reset(skip?: boolean) {
+    let m; 
+    if (!skip) {
+      m = confirm("Are you sure you want to reset bot and clear path?");
+    }
+    if (m || !skip) {
       this.pointsArray = [];
       this.cleanPointsArray = [];
       this.startAngle = 0;
+      this.currAngle = 0;
       this.mlService.resetBot();
       // reset visuals
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);      
@@ -246,6 +250,10 @@ export class AppComponent implements OnInit {
 
       this.mlService.train(cmd[0], cmd[1], oldPos, newPos);
     });
+
+    // reset bot
+    this.reset(true); 
+    console.log('AUTO TRAIN: botCenter' + this.mlService.botCenter.x + ' ' + this.mlService.botCenter.y);
   }
 
   /** get bot's current Cartesian position */
