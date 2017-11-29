@@ -158,7 +158,7 @@ export class AppComponent implements OnInit {
     if (!skip) {
       m = confirm("Are you sure you want to reset bot and clear path?");
     }
-    if (m || !skip) {
+    if (m || skip) {
       this.pointsArray = [];
       this.cleanPointsArray = [];
       this.startAngle = 0;
@@ -167,6 +167,7 @@ export class AppComponent implements OnInit {
       // reset visuals
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);      
       this.drawBot(0, this.mlService.CONST_BOT_CENTER.x, this.mlService.CONST_BOT_CENTER.y);
+      console.log('SKREEEEET');
     }
   }
 
@@ -245,7 +246,7 @@ export class AppComponent implements OnInit {
     commands.forEach(cmd => {
       // get initial and final bot position
       let oldPos = this.getBotPos();
-      let translation: number[] = this.moveBot(cmd[0], cmd[1], true);
+      let translation: number[] = this.moveBot(cmd[0], cmd[1], true, true);
       let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
 
       this.mlService.train(cmd[0], cmd[1], oldPos, newPos);
@@ -266,8 +267,8 @@ export class AppComponent implements OnInit {
    * @param {number} - left wheel speed
    * @param {number} - right wheel speed
    */
-  moveBot(leftSpd: number, rightSpd: number, doNotStoreChange?: boolean): number[] {
-    return this.drawTravelPath(leftSpd, rightSpd, doNotStoreChange);
+  moveBot(leftSpd: number, rightSpd: number, doNotStoreChange?: boolean, skipAni?: boolean): number[] {
+    return this.drawTravelPath(leftSpd, rightSpd, doNotStoreChange, skipAni);
   }
 
   /** draws the path each bot part will move 
@@ -275,7 +276,7 @@ export class AppComponent implements OnInit {
    * @param {number} - number of revolutions left wheel turns in given time
    * @returns {{x,y}} - change in x and y distance
   */
-  drawTravelPath(leftSpeed: number, rightSpeed: number, doNotStoreChange?: boolean): number[] {
+  drawTravelPath(leftSpeed: number, rightSpeed: number, doNotStoreChange?: boolean, skipAni?: boolean): number[] {
     // calculate arc / path of body based on speeds given //
 
     let isCounterClock: boolean;
@@ -293,12 +294,14 @@ export class AppComponent implements OnInit {
       let d: number = leftSpeed * (this.mlService.wheelRadius * 2 * Math.PI) * this.mlService.timeUnit;
       let xChange = d * Math.cos(this.mlService.botAngle);
       let yChange = -(d * Math.sin(this.mlService.botAngle)); // negated because y positive is down
-      // draw line 
-      this.ctx.beginPath();
-      this.ctx.moveTo(this.mlService.botCenter.x, this.mlService.botCenter.y);
-      this.ctx.lineTo(this.mlService.botCenter.x, this.mlService.botCenter.y + yChange);
-      this.ctx.stroke();
-
+      if (!skipAni) {
+        // draw line 
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.mlService.botCenter.x, this.mlService.botCenter.y);
+        this.ctx.lineTo(this.mlService.botCenter.x, this.mlService.botCenter.y + yChange);
+        this.ctx.stroke();
+      }
+      
       // update bot center
       this.mlService.botCenter.y += yChange;
 
@@ -357,11 +360,16 @@ export class AppComponent implements OnInit {
     let startPos: { x: number, y: number } = { x: startX, y: startY };
     let endPos: { x: number, y: number } = { x: endX, y: endY };
     this.currAngle = 0;
-    this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
+    if (skipAni) {
+      
+    } else {
+      this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
+    }
+    
 
     // reset if doNotStore true
     if (doNotStoreChange) {
-      this.mlService.resetBot();
+      this.reset(true);
     }
 
     return [xChange, yChange];
