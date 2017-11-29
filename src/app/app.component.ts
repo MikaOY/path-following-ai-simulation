@@ -406,7 +406,7 @@ export class AppComponent implements OnInit {
       this.ctx.moveTo(startX, startY);
       this.ctx.lineTo(startX + (changeX * this.currLinePercent), startY + (changeY * this.currLinePercent));
       this.ctx.stroke();
-      this.currLinePercent += 0.05;
+      this.currLinePercent += 0.01;
       if (this.currLinePercent < 1) {
         window.requestAnimationFrame(() => {
           this.animateBotAlongLine(startX, startY, changeX, changeY);
@@ -414,7 +414,9 @@ export class AppComponent implements OnInit {
       } else {
         let startPos = { x: startX, y: startY };
         let endPos = { x: startX + changeX, y: startY + changeY };
-        this.endAnimation(this.mlService.botAngle, startPos, endPos);
+        console.log(this.mlService.botAngle + ' sfasdf');
+        this.endAnimation((Math.PI / 2) - this.mlService.botAngle, startPos, endPos);
+        this.currLinePercent = 0;
       }
   } 
 
@@ -439,6 +441,7 @@ export class AppComponent implements OnInit {
         });
       } else {
         // draw bot when finished
+        console.log(endAngle + ' le bot angle i think');
         this.endAnimation(endAngle, startPos, endPos, x, y);
       }
     } else {
