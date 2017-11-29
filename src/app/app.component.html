@@ -1,3 +1,6 @@
+<app-nav-bar>
+</app-nav-bar>
+
 <div class="container-fluid">
   <div class="row">
     <div class="canvas-stuff">
@@ -35,8 +38,8 @@
           Auto train
         </button>
 
-        <a tabindex="0" class="full-btn btn btn-success" role="button" data-toggle="popover" data-trigger="focus" 
-          data-placement="bottom" title="Warning" data-content="Train bot before following path">
+        <a tabindex="0" class="full-btn btn btn-success" role="button" data-toggle="popover" data-trigger="focus" data-placement="bottom"
+          title="Warning" data-content="Train bot before following path">
           Follow path
         </a>
       </div>
@@ -44,8 +47,32 @@
   </div>
 </div>
 
+<div id="about" class="container">
+  <div class="row">
+    <div class="col-md-9 center-text">
+      <h3 class="info-header">About this project</h3>
+      <p class="lead info">
+        This is a demonstration of an artificially intelligent robot with two wheels that learns how to move on the 2D plane by sending
+        commands to its two wheels and studying the resulting change in position. <br> The execution of motor commands
+        is simulated using basic geometric calculations making use of constants such as wheel diameter. Using this learning
+        process, the robot can theoretically perform any movement on the 2D plane, even those it did not specifically learn
+        before.
+      </p>
+    </div>
+    <div class="col-md-3 center-text center-vertical">
+      <div style="margin:1em auto;">
+        <h5>Project code</h5>
+        <a href="https://github.com/MikaOY/path-following-ai-simulation" target="_blank"><i class="fa fa-2x fa-github" aria-hidden="true"></i></a>
+        <h5 style="margin-top:0.5em;">Stay in touch</h5>
+        <a href="https://www.facebook.com/MikaOYeap" target="_blank"><i class="fa fa-2x fa-twitter" aria-hidden="true"></i></a>
+        <a href="https://twitter.com/mikayeap" target="_blank"><i class="fa fa-2x fa-facebook" aria-hidden="true"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div style="text-align:center">
   <hr>
-  <h5 style="margin: 1em">Demo of a general path-following movement AI.</h5>
-  <a href="http://tika.io" target="_blank"><img style="margin-bottom: 2em;" width="10%" src="../assets/tika-text.svg"></a>
+  <h6 style="margin:1.5em;color:gray;">Demo of a general path-following movement AI.</h6>
+  <a href="http://tika.io" target="_blank"><img style="margin: auto auto 1em auto;" width="120px" src="../assets/tika-text.svg"></a>
 </div>

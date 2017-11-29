@@ -3,7 +3,7 @@
 
 This is a demonstration of an artificially intelligent robot with two wheels that learns how to move on the 2D plane by sending commands to its two wheels and studying the resulting change in position. The execution of motor commands is simulated using basic geometric calculations making use of constants such as wheel diameter. 
 
-Using this learning process, the robot can theoretically perform any movement on the 2D plane, even if it did not specifically learn before. 
+Using this learning process, the robot can theoretically perform any movement on the 2D plane, even those it did not specifically learn before. 
 
 ## Development 
 
