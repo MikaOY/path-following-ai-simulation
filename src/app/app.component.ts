@@ -167,6 +167,7 @@ export class AppComponent implements OnInit {
     if (m || skip) {
       this.pointsArray = [];
       this.cleanPointsArray = [];
+      this.pathsArray = [];
       this.startAngle = 0;
       this.currAngle = 0;
       this.mlService.resetBot();
