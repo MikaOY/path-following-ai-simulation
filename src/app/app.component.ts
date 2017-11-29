@@ -84,17 +84,18 @@ export class AppComponent implements OnInit {
    * @param y 
    */
   drawBot(clockAngle: number, x?: number, y?: number) {
+    // set origin to bot center and rotate
     this.ctx.translate(x, y);
     this.ctx.rotate(clockAngle);
+
     this.ctx.strokeStyle = 'black';
     this.ctx.fillStyle = 'orange';
     let width = this.mlService.botWidth;
     let height = this.mlService.botHeight;
-    let startX = 0 - width/2; // draw bot at center of point
-    let startY = 0 + height/2;
-
-    console.log('start point: (' + startX + ', ' + startY + '), clockAngle = ' + clockAngle);
- 
+    let startX = 0 - width / 2; // offset to make it at center
+    let startY = 0 + height / 2;
+    
+    // draw bot
     this.ctx.beginPath();
     this.ctx.moveTo(startX, startY);
     this.ctx.lineTo(startX + width, startY);
@@ -104,9 +105,9 @@ export class AppComponent implements OnInit {
     this.ctx.lineTo(startX + width, startY);
     this.ctx.fill();
     this.ctx.closePath();
+    
+    // reset transform matrix
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
-    // rotate back
-    //this.ctx.rotate(-clockAngle);
   }
 
   /* path-drawing */
@@ -316,9 +317,7 @@ export class AppComponent implements OnInit {
     // 3 - find start and end angle
     this.startAngle = (2 * Math.PI) - (isCounterClock ? (this.mlService.botAngle - Math.PI / 2) : (this.mlService.botAngle + Math.PI / 2));
     endAngle = (isCounterClock ? this.startAngle - (innerArcLength / innerR) : this.startAngle + (innerArcLength / innerR));
-   
     console.log('ANI: start angle = ' + this.startAngle + ' radians, end angle = ' + endAngle + ' radians');
-
 
     // find translation caused by motor movement //
 
@@ -393,7 +392,8 @@ export class AppComponent implements OnInit {
         window.requestAnimationFrame(() => {
           this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
         });
-      } else { // draw bot when finished
+      } else { 
+        // draw bot when finished
         this.endAnimation(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
       }
     } else {
@@ -404,6 +404,7 @@ export class AppComponent implements OnInit {
           this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
         });
       } else {
+        // flip bot in other direction :}
         this.endAnimation(x, y, r, startAngle, endAngle - Math.PI, isCounterClock, startPos, endPos);
       }
     }
@@ -430,7 +431,7 @@ export class AppComponent implements OnInit {
     this.ctx.arc(x, y, 15, 0, 1.2 * Math.PI);
     this.ctx.fill();
     this.ctx.closePath();
-    
+    // draw the bot
     this.drawBot(endAngle, endPos.x, endPos.y);
   }
   
