@@ -85,7 +85,7 @@ export class AppComponent implements OnInit {
    */
   drawBot(clockAngle: number, x?: number, y?: number) {
     this.ctx.translate(x, y);
-   //this.ctx.rotate(clockAngle);
+    this.ctx.rotate(clockAngle);
     this.ctx.strokeStyle = 'black';
     this.ctx.fillStyle = 'orange';
     let width = this.mlService.botWidth;
@@ -394,27 +394,7 @@ export class AppComponent implements OnInit {
           this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
         });
       } else { // draw bot when finished
-        // draw ref points
-        // bot start point
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'orange';
-        this.ctx.strokeStyle = 'black';
-        this.ctx.arc(startPos.x, startPos.y, 10, 0, 2 * Math.PI);
-        this.ctx.fill();
-        // bot end point
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'red';
-        this.ctx.strokeStyle = 'black';
-        this.ctx.arc(endPos.x, endPos.y, 10, 0, 2 * Math.PI);
-        this.ctx.fill();
-        // center of path
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'green';
-        this.ctx.strokeStyle = 'black';
-        this.ctx.arc(x, y, 15, 0, 1.2 * Math.PI);
-        this.ctx.fill();
-        this.ctx.closePath();
-        this.drawBot(endAngle, endPos.x, endPos.y);
+        this.endAnimation(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
       }
     } else {
       this.currAngle += 0.1;
@@ -424,29 +404,34 @@ export class AppComponent implements OnInit {
           this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
         });
       } else {
-        // draw ref points
-        // bot start point
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'orange';
-        this.ctx.strokeStyle = 'black';
-        this.ctx.arc(startPos.x, startPos.y, 10, 0, 2 * Math.PI);
-        this.ctx.fill();
-        // bot end point
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'red';
-        this.ctx.strokeStyle = 'black';
-        this.ctx.arc(endPos.x, endPos.y, 10, 0, 2 * Math.PI);
-        this.ctx.fill();
-        // center of path
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'green';
-        this.ctx.strokeStyle = 'black';
-        this.ctx.arc(x, y, 15, 0, 1.2 * Math.PI);
-        this.ctx.fill();
-        this.ctx.closePath();
-        this.drawBot(endAngle, endPos.x, endPos.y);
+        this.endAnimation(x, y, r, startAngle, endAngle - Math.PI, isCounterClock, startPos, endPos);
       }
     }
+  }
+
+  endAnimation(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos) {
+    // draw ref points
+    // bot start point
+    this.ctx.beginPath();
+    this.ctx.fillStyle = 'orange';
+    this.ctx.strokeStyle = 'black';
+    this.ctx.arc(startPos.x, startPos.y, 10, 0, 2 * Math.PI);
+    this.ctx.fill();
+    // bot end point
+    this.ctx.beginPath();
+    this.ctx.fillStyle = 'red';
+    this.ctx.strokeStyle = 'black';
+    this.ctx.arc(endPos.x, endPos.y, 10, 0, 2 * Math.PI);
+    this.ctx.fill();
+    // center of path
+    this.ctx.beginPath();
+    this.ctx.fillStyle = 'green';
+    this.ctx.strokeStyle = 'black';
+    this.ctx.arc(x, y, 15, 0, 1.2 * Math.PI);
+    this.ctx.fill();
+    this.ctx.closePath();
+    
+    this.drawBot(endAngle, endPos.x, endPos.y);
   }
   
 
