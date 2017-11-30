@@ -235,6 +235,7 @@ export class AppComponent implements OnInit {
     console.log('AUTO TRAINING INITIATED');
 
     // generate commands to train
+    let increment: number = 2; 
     let lowerRange: number = 0;
     let upperRange: number = 4;
     let commands: number[][] = [];
@@ -243,17 +244,16 @@ export class AppComponent implements OnInit {
       angleArray.push(i);
     }
     angleArray.forEach(angle => {
-      let index = lowerRange <= 0 ? 0.2 : lowerRange;
-      // increment x
-      for (var j = 0; j < upperRange; j += 0.2) {
-        commands.push([index + j, index, angle]);
+      for (let index = lowerRange; index < upperRange + increment; index += increment) {
+        index = lowerRange <= 0 ? increment : lowerRange;
+        // increment x and y
+        for (var j = increment; j < upperRange + increment; j += increment) {
+          commands.push([j, index, angle]);
+          commands.push([index, j, angle]);
+        }
       }
-      // increment y
-      for (var j = 0; j < upperRange; j += 0.2) {
-        commands.push([index, index + j, angle]);
-      }
-      // console.log('AUTO TRAIN: auto gen commands = ' + commands.toString());
     });
+    console.log('AUTO TRAIN: number of generated commands' + commands.length);
 
     // train on each command
     commands.forEach(cmd => {
@@ -269,8 +269,8 @@ export class AppComponent implements OnInit {
     // reset bot
     this.reset(true);
     console.log('AUTO TRAIN: botCenter' + this.mlService.botCenter.x + ' ' + this.mlService.botCenter.y);
-    this.mlService.inputPositionChanges.forEach(change => {
-      console.log('AUTO TRAIN: current input ' + change.toString());
+    this.mlService.outputCommands.forEach(change => {
+      console.log('AUTO TRAIN: an output ' + change.toString());
     });
   }
 
