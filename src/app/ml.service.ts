@@ -19,8 +19,9 @@ export class MlService {
   set botAngle(newAngle: number) {
     // simplify angles
     while (newAngle > (Math.PI * 2)) {
-      newAngle -= (Math.PI * 2); 
+      newAngle -= (Math.PI * 2);
     }
+    this._botAngle = newAngle; 
   }
   public botCenter: { x: number, y: number } = this.CONST_BOT_CENTER;
   public timeUnit: number = 1 // number of seconds wheel rotation takes to complete 
@@ -170,5 +171,9 @@ export class MlService {
     this.CONST_BOT_CENTER = { x: this.CONST_BOT_START.x + (this.botWidth / 2), y: this.CONST_BOT_START.y - (this.botHeight / 2) };
     this.botCenter = this.CONST_BOT_CENTER;
     this.botAngle = angle ? angle : this.CONST_BOT_ANGLE;
+    if (angle) {
+      console.log('SERVICE RESET: custom angle = ' + angle);
+      console.log('SERVICE RESET: botAngle reset to ' + this.botAngle);
+    }
   }
 }
