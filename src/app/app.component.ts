@@ -237,15 +237,17 @@ export class AppComponent implements OnInit {
     // generate commands to train
     let increment: number = 0.5; 
     let lowerRange: number = 0;
-    let upperRange: number = 4;
+    let upperRange: number = 2;
     let commands: number[][] = [];
     let angleArray: number[] = [];
-    for (var i = 0; i <= (2 * Math.PI); i += (Math.PI * 1 / 4)) {
+    for (var i = 0; i <= (2 * Math.PI); i += (Math.PI * 1 / 6)) {
       angleArray.push(i);
     }
     angleArray.forEach(angle => {
       // CANNOT have for loop here because it causes jams
-      let array: number[] = [1,2,3]; 
+      let array: number[] = [];
+      for (var index = increment; index < upperRange; index += increment){ array.push(index); }
+
       array.forEach(num => {
         // increment x and y
         for (var j = increment; j < upperRange + increment; j += increment) {
@@ -269,7 +271,6 @@ export class AppComponent implements OnInit {
 
     // reset bot
     this.reset(true);
-    console.log('AUTO TRAIN: botCenter' + this.mlService.botCenter.x + ' ' + this.mlService.botCenter.y);
     this.mlService.outputCommands.forEach(change => {
       console.log('AUTO TRAIN: an output ' + change.toString());
     });
@@ -325,27 +326,27 @@ export class AppComponent implements OnInit {
 
       return [xChange, yChange];
     }
-    console.log('ANI: isCounterCLockwise = ' + isCounterClock);
+    // console.log('ANI: isCounterCLockwise = ' + isCounterClock);
 
     // 2 - find center of arc path
     r = this.mlService.getRadius(leftSpeed, rightSpeed);
     let innerR = r - (this.mlService.botWidth / 2);
-    console.log('ANI: inner arc length = ' + innerArcLength + ', inner arc radius = ' + innerR);
+    // console.log('ANI: inner arc length = ' + innerArcLength + ', inner arc radius = ' + innerR);
 
     // difference to bot center to center
     let arcCenterPolarAngleDiff = isCounterClock ? (this.mlService.botAngle + Math.PI / 2) : (this.mlService.botAngle - Math.PI / 2);
     let botToArcCenterDiffX = (r * Math.cos(arcCenterPolarAngleDiff));
     let botToArcCenterDiffY = -(r * Math.sin(arcCenterPolarAngleDiff));
-    console.log('ANI: arcCenterPolarAngleDiff = ' + arcCenterPolarAngleDiff);
-    console.log('ANI: starting botCenter = (' + this.mlService.botCenter.x + ', ' + this.mlService.botCenter.y + ')');
+    // console.log('ANI: arcCenterPolarAngleDiff = ' + arcCenterPolarAngleDiff);
+    // console.log('ANI: starting botCenter = (' + this.mlService.botCenter.x + ', ' + this.mlService.botCenter.y + ')');
     centerX = botToArcCenterDiffX + this.mlService.botCenter.x;
     centerY = botToArcCenterDiffY + this.mlService.botCenter.y;
-    console.log('ANI: arc center coordinates: (' + centerX + ', ' + centerY + ')');
+    // console.log('ANI: arc center coordinates: (' + centerX + ', ' + centerY + ')');
 
     // 3 - find start and end angle
     this.startAngle = (2 * Math.PI) - (isCounterClock ? (this.mlService.botAngle - Math.PI / 2) : (this.mlService.botAngle + Math.PI / 2));
     endAngle = (isCounterClock ? this.startAngle - (innerArcLength / innerR) : this.startAngle + (innerArcLength / innerR));
-    console.log('ANI: start angle = ' + this.startAngle + ' radians, end angle = ' + endAngle + ' radians');
+    // console.log('ANI: start angle = ' + this.startAngle + ' radians, end angle = ' + endAngle + ' radians');
 
     // find translation caused by motor movement //
 
@@ -355,10 +356,10 @@ export class AppComponent implements OnInit {
 
     // find angle from origin
     let angle = (2 * Math.PI) - endAngle;
-    console.log('ANI: counterclockwise angle from origin = ' + angle);
+    // console.log('ANI: counterclockwise angle from origin = ' + angle);
     // set botAngle depending on direction facing
     this.mlService.botAngle = isCounterClock ? angle + (Math.PI / 2) : angle - (Math.PI / 2);
-    console.log('ANI: botAngle = ' + this.mlService.botAngle);
+    // console.log('ANI: botAngle = ' + this.mlService.botAngle);
 
     // end position coordinates
     let endX = centerX + (r * Math.cos(angle));
