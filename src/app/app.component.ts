@@ -172,7 +172,7 @@ export class AppComponent implements OnInit {
       this.pathsArray = [];
       this.startAngle = 0;
       this.currAnglePercent = 0;
-      this.currentFollowStep = -1; 
+      this.currentFollowStep = -1;
       this.mlService.resetBot(angle);
       // reset visuals
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -235,23 +235,22 @@ export class AppComponent implements OnInit {
     console.log('AUTO TRAINING INITIATED');
 
     // generate commands to train
-    let ints: number[] = [0.5, 1.5, 2.5, 3.5, 4.5, 5.5];
+    let lowerRange: number = 0;
+    let upperRange: number = 4;
     let commands: number[][] = [];
     let angleArray: number[] = [];
     for (let i = 0; i <= (2 * Math.PI); i += (Math.PI * 1 / 4)) {
       angleArray.push(i);
     }
     angleArray.forEach(angle => {
-      for (var index = 0; index < ints.length; index++) {
-        var currentInt = ints[index];
-        // increment x
-        for (var j = 0; j < 1; j += 0.5) {
-          commands.push([currentInt + j, currentInt, angle]);
-        }
-        // increment y
-        for (var j = 0.5; j < 1; j += 0.5) {
-          commands.push([currentInt, currentInt + j, angle]);
-        }
+      let index = lowerRange <= 0 ? 0.2 : lowerRange;
+      // increment x
+      for (var j = 0; j < upperRange; j += 0.2) {
+        commands.push([index + j, index, angle]);
+      }
+      // increment y
+      for (var j = 0; j < upperRange; j += 0.2) {
+        commands.push([index, index + j, angle]);
       }
       // console.log('AUTO TRAIN: auto gen commands = ' + commands.toString());
     });
