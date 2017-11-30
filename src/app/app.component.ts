@@ -235,23 +235,24 @@ export class AppComponent implements OnInit {
     console.log('AUTO TRAINING INITIATED');
 
     // generate commands to train
-    let increment: number = 2; 
+    let increment: number = 0.5; 
     let lowerRange: number = 0;
     let upperRange: number = 4;
     let commands: number[][] = [];
     let angleArray: number[] = [];
-    for (let i = 0; i <= (2 * Math.PI); i += (Math.PI * 1 / 4)) {
+    for (var i = 0; i <= (2 * Math.PI); i += (Math.PI * 1 / 4)) {
       angleArray.push(i);
     }
     angleArray.forEach(angle => {
-      for (let index = lowerRange; index < upperRange + increment; index += increment) {
-        index = lowerRange <= 0 ? increment : lowerRange;
+      // CANNOT have for loop here because it causes jams
+      let array: number[] = [1,2,3]; 
+      array.forEach(num => {
         // increment x and y
         for (var j = increment; j < upperRange + increment; j += increment) {
-          commands.push([j, index, angle]);
-          commands.push([index, j, angle]);
+          commands.push([j, num, angle]);
+          commands.push([num, j, angle]);
         }
-      }
+      }); 
     });
     console.log('AUTO TRAIN: number of generated commands' + commands.length);
 
