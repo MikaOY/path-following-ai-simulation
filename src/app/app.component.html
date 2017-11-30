@@ -41,6 +41,10 @@
         <button class="full-btn btn btn-success" (click)="followPath()">
           Follow path
         </button>
+        <button *ngIf="this.currentFollowStep >= 0 && this.currentFollowStep < this.cleanPointsArray.length - 1" 
+          type="button" id="clr" class="full-btn btn btn-light" (click)="followNextPoint()">
+          Next point
+        </button>
 
         <!-- Bootstrap popover warning
         <a tabindex="0" class="full-btn btn btn-success" role="button" data-toggle="popover" data-trigger="focus" data-placement="bottom"
