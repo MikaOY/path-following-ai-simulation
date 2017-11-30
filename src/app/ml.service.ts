@@ -49,7 +49,7 @@ export class MlService {
       this.regressionModel = new MLR(this.inputPositionChanges, this.outputCommands);
       console.log('ML: Latest regression model = ' + this.regressionModel);
       // TODO: remove logs below      
-      console.log('ML: Prediction with pos change [100,200] is ' + this.regressionModel.predict([[100, 200]]).toString());
+      console.log('ML: Prediction with pos change [100,200, Pi] is ' + this.regressionModel.predict([[100, 200, Math.PI]]).toString());
     }
   }
 
@@ -173,7 +173,7 @@ export class MlService {
     this.botAngle = angle ? angle : this.CONST_BOT_ANGLE;
     if (angle) {
       console.log('SERVICE RESET: custom angle = ' + angle);
-      console.log('SERVICE RESET: botAngle reset to ' + this.botAngle);
     }
+    console.log('SERVICE RESET: botAngle reset to ' + this.botAngle);
   }
 }
