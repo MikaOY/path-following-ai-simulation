@@ -12,8 +12,17 @@ export class MlService {
   public CONST_BOT_START: { x: number, y: number } = { x: 275, y: 300 };
   public CONST_BOT_CENTER: { x: number, y: number } = { x: this.CONST_BOT_START.x + (this.botWidth / 2), y: this.CONST_BOT_START.y - (this.botHeight / 2) };
   public CONST_BOT_ANGLE = Math.PI / 2;
-  public botAngle = this.CONST_BOT_ANGLE; // direction bot is facing in, counterclock from origin
-  public botCenter: { x: number, y: number } = this.CONST_BOT_CENTER; 
+  private _botAngle = this.CONST_BOT_ANGLE; // direction bot is facing in, counterclock from origin
+  get botAngle(): number {
+    return this._botAngle;
+  }
+  set botAngle(newAngle: number) {
+    // simplify angles
+    while (newAngle > (Math.PI * 2)) {
+      newAngle -= (Math.PI * 2); 
+    }
+  }
+  public botCenter: { x: number, y: number } = this.CONST_BOT_CENTER;
   public timeUnit: number = 1 // number of seconds wheel rotation takes to complete 
 
   // service properties
@@ -26,13 +35,13 @@ export class MlService {
   /** train ML model with user-given commands */
   train(leftCmd: number, rightCmd: number, pos: number[], newPos: number[], angle: number) {
     if (!(pos && newPos && leftCmd && rightCmd)) {
-      console.log('ML: old position = ' + pos); 
-      console.log('ML: new position = ' + newPos); 
-      console.log('ML: left command = ' + leftCmd); 
-      console.log('ML: right command = ' + rightCmd); 
-      console.error('Not enough defined params to train model!'); 
+      console.log('ML: old position = ' + pos);
+      console.log('ML: new position = ' + newPos);
+      console.log('ML: left command = ' + leftCmd);
+      console.log('ML: right command = ' + rightCmd);
+      console.error('Not enough defined params to train model!');
     } else {
-      let diff: number[] = this.calculatePosDifference(pos, newPos); 
+      let diff: number[] = this.calculatePosDifference(pos, newPos);
       this.record(leftCmd, rightCmd, diff[0], diff[1], angle);
 
       // train the model on training data
@@ -47,9 +56,9 @@ export class MlService {
   record(leftCmd, rightCmd, xChange, yChange, angle) {
     // plot left + right command, pos change X + Y as one point in ML training data
     this.inputPositionChanges.push([xChange, yChange, angle]);
-    console.log('ML: Recording input = ' + '[ ' + xChange + ', ' + yChange + ', ' + angle + ' ]');     
+    console.log('ML: Recording input = ' + '[ ' + xChange + ', ' + yChange + ', ' + angle + ' ]');
     this.outputCommands.push([leftCmd, rightCmd]);
-    console.log('ML: Recording output = ' + '[ ' + leftCmd + ', ' + rightCmd + ' ]');     
+    console.log('ML: Recording output = ' + '[ ' + leftCmd + ', ' + rightCmd + ' ]');
   }
 
   /**
@@ -149,17 +158,17 @@ export class MlService {
     if (this.regressionModel && changeX && changeY && angle) {
       return this.regressionModel.predict([[changeX, changeY, angle]]);
     } else {
-      console.error('Regression model undefined, cannot make prediction!'); 
+      console.error('Regression model undefined, cannot make prediction!');
     }
   }
 
   /**
    * Resets stored position to original
    */
-  resetBot() {
+  resetBot(angle?: number) {
     // TODO: figure out why the const is not const
     this.CONST_BOT_CENTER = { x: this.CONST_BOT_START.x + (this.botWidth / 2), y: this.CONST_BOT_START.y - (this.botHeight / 2) };
     this.botCenter = this.CONST_BOT_CENTER;
-    this.botAngle = this.CONST_BOT_ANGLE;
+    this.botAngle = angle ? angle : this.CONST_BOT_ANGLE;
   }
 }

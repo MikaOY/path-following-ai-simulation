@@ -161,7 +161,7 @@ export class AppComponent implements OnInit {
     this.pointsArray.push({ x: this.prevX, y: this.prevY });
   }
 
-  reset(skip?: boolean) {
+  reset(skip?: boolean, angle?: number) {
     let m;
     if (!skip) {
       m = confirm("Are you sure you want to reset bot and clear path?");
@@ -173,7 +173,7 @@ export class AppComponent implements OnInit {
       this.startAngle = 0;
       this.currAngle = 0;
       this.currentFollowStep = -1; 
-      this.mlService.resetBot();
+      this.mlService.resetBot(angle);
       // reset visuals
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.drawBot(0, this.mlService.CONST_BOT_CENTER.x, this.mlService.CONST_BOT_CENTER.y);
@@ -264,7 +264,7 @@ export class AppComponent implements OnInit {
       let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
       this.mlService.train(cmd[0], cmd[1], oldPos, newPos, cmd[2]);
       // reset bot
-      this.reset(true);
+      this.reset(true, cmd[2]);
     });
 
     // reset bot
