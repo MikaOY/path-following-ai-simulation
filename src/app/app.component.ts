@@ -39,7 +39,7 @@ export class AppComponent implements OnInit {
   }[] = [];
   currentFollowStep: number = -1;
 
-  constructor(private mlService: MlService) { }
+  constructor(public mlService: MlService) { }
 
   ngOnInit() {
 
