@@ -24,7 +24,7 @@ export class MlService {
   constructor() { }
 
   /** train ML model with user-given commands */
-  train(leftCmd: number, rightCmd: number, angle: number, pos: number[], newPos: number[]) {
+  train(leftCmd: number, rightCmd: number, pos: number[], newPos: number[], angle: number) {
     if (!(pos && newPos && leftCmd && rightCmd)) {
       console.log('ML: old position = ' + pos); 
       console.log('ML: new position = ' + newPos); 
@@ -33,7 +33,7 @@ export class MlService {
       console.error('Not enough defined params to train model!'); 
     } else {
       let diff: number[] = this.calculatePosDifference(pos, newPos); 
-      this.record(leftCmd, rightCmd, angle, diff[0], diff[1]);
+      this.record(leftCmd, rightCmd, diff[0], diff[1], angle);
 
       // train the model on training data
       this.regressionModel = new MLR(this.inputPositionChanges, this.outputCommands);
@@ -44,12 +44,12 @@ export class MlService {
   }
 
   /** record command and result of executing it as ML training data */
-  record(leftCmd, rightCmd, angle, xChange, yChange) {
+  record(leftCmd, rightCmd, xChange, yChange, angle) {
     // plot left + right command, pos change X + Y as one point in ML training data
-    this.inputPositionChanges.push([xChange, yChange]);
-    console.log('ML: Recording input = ' + '[ ' + leftCmd + ', ' + rightCmd + ', ' + angle + ' ]'); 
+    this.inputPositionChanges.push([xChange, yChange, angle]);
+    console.log('ML: Recording input = ' + '[ ' + xChange + ', ' + yChange + ', ' + angle + ' ]');     
     this.outputCommands.push([leftCmd, rightCmd]);
-    console.log('ML: Recording output = ' + '[ ' + xChange + ', ' + yChange + ' ]'); 
+    console.log('ML: Recording output = ' + '[ ' + leftCmd + ', ' + rightCmd + ' ]');     
   }
 
   /**
@@ -145,9 +145,9 @@ export class MlService {
    * @param {number} changeY 
    * @returns {[[leftCmd, rightCmd]]} - change in Cartesian position, given as a 1D array with x and y component of translation
    */
-  predictCmd(changeX: number, changeY: number): number[][] {
-    if (this.regressionModel) {
-      return this.regressionModel.predict([[changeX, changeY]]);
+  predictCmd(changeX: number, changeY: number, angle: number): number[][] {
+    if (this.regressionModel && changeX && changeY && angle) {
+      return this.regressionModel.predict([[changeX, changeY, angle]]);
     } else {
       console.error('Regression model undefined, cannot make prediction!'); 
     }

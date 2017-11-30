@@ -172,6 +172,7 @@ export class AppComponent implements OnInit {
       this.pathsArray = [];
       this.startAngle = 0;
       this.currAngle = 0;
+      this.currentFollowStep = -1; 
       this.mlService.resetBot();
       // reset visuals
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -226,44 +227,52 @@ export class AppComponent implements OnInit {
     let translation: number[] = this.moveBot(this.leftCmd, this.rightCmd);
     let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
 
-    this.mlService.train(this.leftCmd, this.rightCmd, this.mlService.botAngle, oldPos, newPos);
+    this.mlService.train(this.leftCmd, this.rightCmd, oldPos, newPos, this.mlService.botAngle);
   }
 
   /** train with many auto generated points */
   autoTrain() {
     console.log('AUTO TRAINING INITIATED');
 
-    // generate commands
+    // generate commands to train
     let ints: number[] = [0.5, 1.5, 2.5, 3.5, 4.5, 5.5];
     let commands: number[][] = [];
-    for (var index = 0; index < ints.length; index++) {
-      var currentInt = ints[index];
-      // increment x
-      for (var j = 0; j < 1; j += 0.5) {
-        let newGen =
-          commands.push([currentInt + j, currentInt]);
-      }
-      // increment y
-      for (var j = 0.5; j < 1; j += 0.5) {
-        commands.push([currentInt, currentInt + j]);
-      }
+    let angleArray: number[] = [];
+    for (let i = 0; i <= (2 * Math.PI); i += (Math.PI * 1 / 4)) {
+      angleArray.push(i);
     }
-    console.log('TRAIN: auto gen commands = ' + commands.toString());
+    angleArray.forEach(angle => {
+      for (var index = 0; index < ints.length; index++) {
+        var currentInt = ints[index];
+        // increment x
+        for (var j = 0; j < 1; j += 0.5) {
+          commands.push([currentInt + j, currentInt, angle]);
+        }
+        // increment y
+        for (var j = 0.5; j < 1; j += 0.5) {
+          commands.push([currentInt, currentInt + j, angle]);
+        }
+      }
+      // console.log('AUTO TRAIN: auto gen commands = ' + commands.toString());
+    });
 
     // train on each command
     commands.forEach(cmd => {
       // get initial and final bot position
       let oldPos = this.getBotPos();
-      let startingAngle = this.mlService.botAngle;
       let translation: number[] = this.moveBot(cmd[0], cmd[1], true);
       let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
-
-      this.mlService.train(cmd[0], cmd[1], startingAngle, oldPos, newPos);
+      this.mlService.train(cmd[0], cmd[1], oldPos, newPos, cmd[2]);
+      // reset bot
+      this.reset(true);
     });
 
     // reset bot
     this.reset(true);
     console.log('AUTO TRAIN: botCenter' + this.mlService.botCenter.x + ' ' + this.mlService.botCenter.y);
+    this.mlService.inputPositionChanges.forEach(change => {
+      console.log('AUTO TRAIN: current input ' + change.toString());
+    });
   }
 
   /** get bot's current Cartesian position */
@@ -287,7 +296,6 @@ export class AppComponent implements OnInit {
   */
   drawTravelPath(leftSpeed: number, rightSpeed: number, skipAni?: boolean): number[] {
     // calculate arc / path of body based on speeds given //
-
     let isCounterClock: boolean;
     let centerX, centerY, r, endAngle, innerArcLength, currAngle: number;
 
@@ -551,7 +559,8 @@ export class AppComponent implements OnInit {
 
     let diff: number[] = this.mlService.calculatePosDifference(this.getBotPos(), [currentPoint.x, currentPoint.y]);
     console.log('PATH: Point difference: (' + diff[0] + ', ' + diff[1] + ')');
-    let cmd: number[][] = this.mlService.predictCmd(diff[0], diff[1]);
+    console.log('PATH: Current angle: (' + this.mlService.botAngle + ')');
+    let cmd: number[][] = this.mlService.predictCmd(diff[0], diff[1], this.mlService.botAngle);
     console.log('PATH: Predicted motor commands: (' + cmd[0][0] + ', ' + cmd[0][1] + ')');
 
     this.moveBot(cmd[0][0], cmd[0][1]);
