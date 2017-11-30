@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
   y = 2;
   canvasWidth: number;
   canvasHeight: number;
-  currAngle: number = 0; // number added/subtracted for animation purposes
+  currAnglePercent: number = 0; // number added/subtracted for animation purposes
   startAngle: number = 0; // clockwise angle from origin to start 
   currLinePercent: number = 0; // percent animated
   // training //
@@ -171,7 +171,7 @@ export class AppComponent implements OnInit {
       this.cleanPointsArray = [];
       this.pathsArray = [];
       this.startAngle = 0;
-      this.currAngle = 0;
+      this.currAnglePercent = 0;
       this.currentFollowStep = -1; 
       this.mlService.resetBot(angle);
       // reset visuals
@@ -377,7 +377,7 @@ export class AppComponent implements OnInit {
     // clear canvas and draw movement path //
     let startPos: { x: number, y: number } = { x: startX, y: startY };
     let endPos: { x: number, y: number } = { x: endX, y: endY };
-    this.currAngle = 0;
+    this.currAnglePercent = 0;
     if (skipAni) {
 
     } else {
@@ -476,14 +476,16 @@ export class AppComponent implements OnInit {
     this.drawStoredPaths();
     // Start over
     this.ctx.beginPath();
+    // calculate angle difference based on percentage
+    let drawToAngle = (endAngle - startAngle) * this.currAnglePercent;
     // Re-draw from the very beginning each time so there isn't tiny line spaces between each section 
-    this.ctx.arc(x, y, r, startAngle, startAngle + this.currAngle, isCounterClock);
+    this.ctx.arc(x, y, r, startAngle, startAngle + drawToAngle, isCounterClock);
     // Draw
     this.ctx.stroke();
     // Increment percent
     if (isCounterClock) {
-      this.currAngle -= 0.1;
-      if (startAngle + this.currAngle > endAngle) {
+      this.currAnglePercent += 0.04;
+      if (startAngle + drawToAngle > endAngle) {
         // Recursive repeat this function until the end is reached
         window.requestAnimationFrame(() => {
           this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
@@ -498,8 +500,8 @@ export class AppComponent implements OnInit {
         this.endAnimation(endAngle, startPos, endPos, x, y);
       }
     } else {
-      this.currAngle += 0.1;
-      if (startAngle + this.currAngle < endAngle) {
+      this.currAnglePercent += 0.04;
+      if (startAngle + drawToAngle < endAngle) {
         // Recursive repeat this function until the end is reached
         window.requestAnimationFrame(() => {
           this.animateBotAlongPath(x, y, r, startAngle, endAngle, isCounterClock, startPos, endPos);
