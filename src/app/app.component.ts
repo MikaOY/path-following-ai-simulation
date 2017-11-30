@@ -164,7 +164,7 @@ export class AppComponent implements OnInit {
   reset(skip?: boolean, angle?: number) {
     let m;
     if (!skip) {
-      m = confirm("Are you sure you want to reset bot and clear path?");
+      m = confirm("Are you sure you want to reset the robot and clear all paths?");
     }
     if (m || skip) {
       this.pointsArray = [];
