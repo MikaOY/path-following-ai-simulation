@@ -226,7 +226,7 @@ export class AppComponent implements OnInit {
     let translation: number[] = this.moveBot(this.leftCmd, this.rightCmd);
     let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
 
-    this.mlService.train(this.leftCmd, this.rightCmd, oldPos, newPos);
+    this.mlService.train(this.leftCmd, this.rightCmd, this.mlService.botAngle, oldPos, newPos);
   }
 
   /** train with many auto generated points */
@@ -254,10 +254,11 @@ export class AppComponent implements OnInit {
     commands.forEach(cmd => {
       // get initial and final bot position
       let oldPos = this.getBotPos();
-      let translation: number[] = this.moveBot(cmd[0], cmd[1], true, true);
+      let startingAngle = this.mlService.botAngle;
+      let translation: number[] = this.moveBot(cmd[0], cmd[1], true);
       let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
 
-      this.mlService.train(cmd[0], cmd[1], oldPos, newPos);
+      this.mlService.train(cmd[0], cmd[1], startingAngle, oldPos, newPos);
     });
 
     // reset bot
@@ -275,8 +276,8 @@ export class AppComponent implements OnInit {
    * @param {number} - left wheel speed
    * @param {number} - right wheel speed
    */
-  moveBot(leftSpd: number, rightSpd: number, doNotStoreChange?: boolean, skipAni?: boolean): number[] {
-    return this.drawTravelPath(leftSpd, rightSpd, doNotStoreChange, skipAni);
+  moveBot(leftSpd: number, rightSpd: number, skipAni?: boolean): number[] {
+    return this.drawTravelPath(leftSpd, rightSpd, skipAni);
   }
 
   /** draws the path each bot part will move 
@@ -284,7 +285,7 @@ export class AppComponent implements OnInit {
    * @param {number} - number of revolutions left wheel turns in given time
    * @returns {{x,y}} - change in x and y distance
   */
-  drawTravelPath(leftSpeed: number, rightSpeed: number, doNotStoreChange?: boolean, skipAni?: boolean): number[] {
+  drawTravelPath(leftSpeed: number, rightSpeed: number, skipAni?: boolean): number[] {
     // calculate arc / path of body based on speeds given //
 
     let isCounterClock: boolean;
@@ -373,11 +374,6 @@ export class AppComponent implements OnInit {
 
     } else {
       this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
-    }
-
-    // reset if doNotStore true
-    if (doNotStoreChange) {
-      this.reset(true);
     }
 
     return [xChange, yChange];
