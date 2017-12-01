@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
   // training //
   leftCmd: number;
   rightCmd: number;
+  public autoTrainProgress: number = 0; 
   // working //
   pointsArray: { x: number, y: number }[] = [];
   cleanPointsArray: { x: number, y: number }[] = [];
@@ -231,49 +232,57 @@ export class AppComponent implements OnInit {
   }
 
   /** train with many auto generated points */
-  autoTrain() {
-    console.log('AUTO TRAINING INITIATED');
+  autoTrain(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      console.log('AUTO TRAINING INITIATED');
 
-    // generate commands to train
-    let increment: number = 0.3;
-    let lowerRange: number = 0;
-    let upperRange: number = 2;
-    let commands: number[][] = [];
-    let angleArray: number[] = [];
-    for (var i = 0; i <= (2* Math.PI); i += (Math.PI * 1 / 6)) {
-      angleArray.push(i);
-    }
-    angleArray.forEach(angle => {
-      // CANNOT have for loop here because it causes jams
-      let array: number[] = [];
-      for (var index = increment; index < upperRange; index += increment) { array.push(index); }
+      // generate commands to train
+      let increment: number = 0.5;
+      let lowerRange: number = 0;
+      let upperRange: number = 3;
+      let commands: number[][] = [];
+      let angleArray: number[] = [];
+      for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 5)) {
+        angleArray.push(i);
+      }
+      angleArray.forEach(angle => {
+        // CANNOT have for loop here because it causes jams
+        let array: number[] = [];
+        for (var index = increment; index < upperRange; index += increment) { array.push(index); }
 
-      array.forEach(num => {
-        // increment x and y
-        for (var j = increment; j < upperRange + increment; j += increment) {
-          commands.push([j, num, angle]);
-          commands.push([num, j, angle]);
-        }
+        array.forEach(num => {
+          // increment x and y
+          for (var j = increment; j < upperRange + increment; j += increment) {
+            commands.push([j, num, angle]);
+            commands.push([num, j, angle]);
+          }
+        });
       });
-    });
-    console.log('AUTO TRAIN: number of generated commands' + commands.length);
+      console.log('AUTO TRAIN: number of generated commands' + commands.length);
 
-    // train on each command
-    commands.forEach(cmd => {
-      // get initial and final bot position
-      let oldPos = this.getBotPos();
-      let translation: number[] = this.moveBot(cmd[0], cmd[1], true);
-      let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
-      this.mlService.train(cmd[0], cmd[1], oldPos, newPos, cmd[2]);
+      // train on each command
+      commands.forEach(cmd => {
+        // update progress visuals
+        let index = commands.indexOf(cmd); 
+        this.autoTrainProgress = index / commands.length;  
+
+        // get initial and final bot position
+        let oldPos = this.getBotPos();
+        let translation: number[] = this.moveBot(cmd[0], cmd[1], true);
+        let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
+        this.mlService.train(cmd[0], cmd[1], oldPos, newPos, cmd[2]);
+        // reset bot
+        this.reset(true, cmd[2]);
+      });
+
       // reset bot
-      this.reset(true, cmd[2]);
-    });
+      this.reset(true);
+      this.mlService.outputCommands.forEach(change => {
+        console.log('AUTO TRAIN: an output ' + change.toString());
+      });
 
-    // reset bot
-    this.reset(true);
-    this.mlService.outputCommands.forEach(change => {
-      console.log('AUTO TRAIN: an output ' + change.toString());
-    });
+      resolve(null); 
+    })
   }
 
   /** get bot's current Cartesian position */
@@ -555,9 +564,9 @@ export class AppComponent implements OnInit {
     // train model before following
     if (this.currentFollowStep < 0) {
       this.calculateCleanPoints();
-      this.mlService.trainNeuralNet(); 
-      this.currentFollowStep = 0;      
-    } 
+      this.mlService.trainNeuralNet();
+      this.currentFollowStep = 0;
+    }
     if (this.currentFollowStep >= 0) {
       // get point based on slowly incremented index, predict motor commands to get there, then execute
       let currentPoint = this.cleanPointsArray[this.currentFollowStep];
@@ -573,8 +582,9 @@ export class AppComponent implements OnInit {
   }
 
   /** moves bot to next point in path */
-  followNextPoint() {
-    this.currentFollowStep++;
+  followNextPoint(moveSteps?: number) {
+    if (moveSteps) this.currentFollowStep += moveSteps;
+    else this.currentFollowStep++;
     this.followPath();
   }
 }

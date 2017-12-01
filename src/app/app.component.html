@@ -38,15 +38,22 @@
           Auto train
         </button>
 
+        <mat-progress-bar *ngIf="this.autoTrainProgress != 1 && this.autoTrainProgress != 0" mode="value" 
+          [value]="this.autoTrainProgress"></mat-progress-bar>
+
         <button class="full-btn btn btn-success" (click)="followPath()">
           Follow path
         </button>
-        <button *ngIf="this.currentFollowStep >= 0 && this.currentFollowStep < this.cleanPointsArray.length - 1" 
-          type="button" id="clr" class="full-btn btn btn-light" (click)="followNextPoint()">
+        <button *ngIf="this.currentFollowStep >= 0 && this.currentFollowStep < this.cleanPointsArray.length" type="button" id="clr"
+          class="full-btn btn btn-light" (click)="followNextPoint(-1)">
+          Retry previous
+        </button>
+        <button *ngIf="this.currentFollowStep >= 0 && this.currentFollowStep < this.cleanPointsArray.length - 1" type="button" id="clr"
+          class="full-btn btn btn-light" (click)="followNextPoint()">
           Next point
         </button>
 
-        <h3 *ngIf="this.mlService.neuralNet">Neural net ready!</h3>
+        <h5 *ngIf="this.mlService.neuralNet">Neural net ready!</h5>
 
         <!-- Bootstrap popover warning
         <a tabindex="0" class="full-btn btn btn-success" role="button" data-toggle="popover" data-trigger="focus" data-placement="bottom"
@@ -71,11 +78,11 @@
     <div class="col-md-9 center-text">
       <h3 class="info-header">About this project</h3>
       <p class="lead info">
-        This is a demonstration of an artificially intelligent robot that learns how to move on the 2D plane. You
-        can interact this AI through the simulation above. <a href="#how-to">Skip to the instructions</a> to get started.
-        <br> The robot has two wheels, arranged opposite each other, that can turn at varying speeds. By moving its 
-        two wheels and studying the resulting change in position over many trials, the robot learns how to accomplish
-        complex movements, even those it did not learn before. 
+        This is a demonstration of an artificially intelligent robot that learns how to move on the 2D plane. You can interact this
+        AI through the simulation above. <a href="#how-to">Skip to the instructions</a> to get started.
+        <br> The robot has two wheels, arranged opposite each other, that can turn at varying speeds. By moving its two wheels
+        and studying the resulting change in position over many trials, the robot learns how to accomplish complex movements,
+        even those it did not learn before.
       </p>
     </div>
     <div class="col-md-3 center-text center-vertical">
