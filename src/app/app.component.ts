@@ -264,7 +264,7 @@ export class AppComponent implements OnInit {
       commands.forEach(cmd => {
         // update progress visuals
         let index = commands.indexOf(cmd); 
-        this.autoTrainProgress = index / commands.length;  
+        this.autoTrainProgress = index / commands.length * 100;  
 
         // get initial and final bot position
         let oldPos = this.getBotPos();

@@ -38,7 +38,7 @@
           Auto train
         </button>
 
-        <mat-progress-bar *ngIf="this.autoTrainProgress != 1 && this.autoTrainProgress != 0" mode="value" 
+        <mat-progress-bar *ngIf="this.autoTrainProgress != 1 && this.autoTrainProgress != 0" id="auto-train-progress" mode="value" 
           [value]="this.autoTrainProgress"></mat-progress-bar>
 
         <button class="full-btn btn btn-success" (click)="followPath()">
