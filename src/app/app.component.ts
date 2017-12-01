@@ -235,18 +235,18 @@ export class AppComponent implements OnInit {
     console.log('AUTO TRAINING INITIATED');
 
     // generate commands to train
-    let increment: number = 0.5; 
+    let increment: number = 0.3;
     let lowerRange: number = 0;
     let upperRange: number = 2;
     let commands: number[][] = [];
     let angleArray: number[] = [];
-    for (var i = 0; i <= (2 * Math.PI); i += (Math.PI * 1 / 6)) {
+    for (var i = 0; i <= (2* Math.PI); i += (Math.PI * 1 / 6)) {
       angleArray.push(i);
     }
     angleArray.forEach(angle => {
       // CANNOT have for loop here because it causes jams
       let array: number[] = [];
-      for (var index = increment; index < upperRange; index += increment){ array.push(index); }
+      for (var index = increment; index < upperRange; index += increment) { array.push(index); }
 
       array.forEach(num => {
         // increment x and y
@@ -254,7 +254,7 @@ export class AppComponent implements OnInit {
           commands.push([j, num, angle]);
           commands.push([num, j, angle]);
         }
-      }); 
+      });
     });
     console.log('AUTO TRAIN: number of generated commands' + commands.length);
 
@@ -552,21 +552,24 @@ export class AppComponent implements OnInit {
 
   /** moves bot along path, using ML predictions; incrementally */
   followPath() {
+    // train model before following
     if (this.currentFollowStep < 0) {
-      this.currentFollowStep = 0;
       this.calculateCleanPoints();
+      this.mlService.trainNeuralNet(); 
+      this.currentFollowStep = 0;      
+    } 
+    if (this.currentFollowStep >= 0) {
+      // get point based on slowly incremented index, predict motor commands to get there, then execute
+      let currentPoint = this.cleanPointsArray[this.currentFollowStep];
+
+      let diff: number[] = this.mlService.calculatePosDifference(this.getBotPos(), [currentPoint.x, currentPoint.y]);
+      console.log('PATH: Point difference: (' + diff[0] + ', ' + diff[1] + ')');
+      console.log('PATH: Current angle: (' + this.mlService.botAngle + ')');
+      let cmd: number[][] = this.mlService.predictCmd(diff[0], diff[1], this.mlService.botAngle);
+      console.log('PATH: Predicted motor commands: (' + cmd[0][0] + ', ' + cmd[0][1] + ')');
+
+      this.moveBot(cmd[0][0], cmd[0][1]);
     }
-
-    // get point based on slowly incremented index, predict motor commands to get there, then execute
-    let currentPoint = this.cleanPointsArray[this.currentFollowStep];
-
-    let diff: number[] = this.mlService.calculatePosDifference(this.getBotPos(), [currentPoint.x, currentPoint.y]);
-    console.log('PATH: Point difference: (' + diff[0] + ', ' + diff[1] + ')');
-    console.log('PATH: Current angle: (' + this.mlService.botAngle + ')');
-    let cmd: number[][] = this.mlService.predictCmd(diff[0], diff[1], this.mlService.botAngle);
-    console.log('PATH: Predicted motor commands: (' + cmd[0][0] + ', ' + cmd[0][1] + ')');
-
-    this.moveBot(cmd[0][0], cmd[0][1]);
   }
 
   /** moves bot to next point in path */

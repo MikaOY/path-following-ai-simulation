@@ -46,6 +46,8 @@
           Next point
         </button>
 
+        <h3 *ngIf="this.mlService.neuralNet">Neural net ready!</h3>
+
         <!-- Bootstrap popover warning
         <a tabindex="0" class="full-btn btn btn-success" role="button" data-toggle="popover" data-trigger="focus" data-placement="bottom"
           title="Warning" data-content="Train bot before following path">

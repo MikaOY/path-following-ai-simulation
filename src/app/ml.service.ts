@@ -1,6 +1,7 @@
 
 import { Injectable } from '@angular/core';
 import MLR from 'ml-regression-multivariate-linear';
+import FeedForwardNeuralNetworks from 'ml-fnn';
 
 @Injectable()
 export class MlService {
@@ -21,13 +22,14 @@ export class MlService {
     while (newAngle > (Math.PI * 2)) {
       newAngle -= (Math.PI * 2);
     }
-    this._botAngle = newAngle; 
+    this._botAngle = newAngle;
   }
   public botCenter: { x: number, y: number } = this.CONST_BOT_CENTER;
   public timeUnit: number = 1 // number of seconds wheel rotation takes to complete 
 
   // service properties
   private regressionModel;
+  public neuralNet;
   public inputPositionChanges: number[][] = [];
   public outputCommands: number[][] = [];
 
@@ -51,6 +53,14 @@ export class MlService {
       // TODO: remove logs below      
       console.log('ML: Prediction with pos change [100,200, Pi] is ' + this.regressionModel.predict([[100, 200, Math.PI]]).toString());
     }
+  }
+
+  /** train ML model with user-given commands */
+  trainNeuralNet() {
+    this.neuralNet = new FeedForwardNeuralNetworks();
+    this.neuralNet.train(this.inputPositionChanges, this.outputCommands);
+    console.log('ML-NN: Prediction with pos change [100,200, Pi] is '
+      + this.neuralNet.predict([[100, 200, Math.PI]]).toString());
   }
 
   /** record command and result of executing it as ML training data */
@@ -156,10 +166,10 @@ export class MlService {
    * @returns {[[leftCmd, rightCmd]]} - change in Cartesian position, given as a 1D array with x and y component of translation
    */
   predictCmd(changeX: number, changeY: number, angle: number): number[][] {
-    if (this.regressionModel && changeX && changeY && angle) {
-      return this.regressionModel.predict([[changeX, changeY, angle]]);
+    if (this.neuralNet && changeX && changeY && angle) {
+      return this.neuralNet.predict([[changeX, changeY, angle]]);
     } else {
-      console.error('Regression model undefined, cannot make prediction!');
+      console.error('Neural net undefined, cannot make prediction!');
     }
   }
 
