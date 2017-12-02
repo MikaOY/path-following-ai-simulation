@@ -126,8 +126,8 @@ export class AppComponent implements OnInit {
     if (res == 'down') {
       this.prevX = this.currX;
       this.prevY = this.currY;
-      this.currX = e.clientX - this.canvas.offsetLeft;
-      this.currY = e.clientY - this.canvas.offsetTop;
+      this.currX = e.pageX - this.canvas.offsetLeft;
+      this.currY = e.pageY - this.canvas.offsetTop;
 
       this.flag = true;
       this.dot_flag = true;
@@ -146,8 +146,8 @@ export class AppComponent implements OnInit {
       if (this.flag) {
         this.prevX = this.currX;
         this.prevY = this.currY;
-        this.currX = e.clientX - this.canvas.offsetLeft;
-        this.currY = e.clientY - this.canvas.offsetTop;
+        this.currX = e.pageX - this.canvas.offsetLeft;
+        this.currY = e.pageY - this.canvas.offsetTop;
         this.draw();
       }
     }
