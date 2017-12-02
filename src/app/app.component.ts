@@ -191,14 +191,20 @@ export class AppComponent implements OnInit {
 
       // only add clean point if far enough away from previous
       if (index == 0) {
-        this.cleanPointsArray.push(messyPoint);
+        // do not add duplicates
+        if (!this.cleanPointsArray.find((pt, i, a) => pt.x == messyPoint.x && pt.y == messyPoint.y)) {
+          this.cleanPointsArray.push(messyPoint);
+        }
       }
       else {
         let latestCleanPoint = this.cleanPointsArray[this.cleanPointsArray.length - 1];
         let dist = Math.sqrt(((latestCleanPoint.x - messyPoint.x) ** 2 + (latestCleanPoint.y - messyPoint.y) ** 2));
 
         if (dist > 30) {
-          this.cleanPointsArray.push(messyPoint);
+          // do not add duplicates
+          if (!this.cleanPointsArray.find((pt, i, a) => pt.x == messyPoint.x && pt.y == messyPoint.y)) {
+            this.cleanPointsArray.push(messyPoint);
+          }
         }
       }
     }
@@ -572,11 +578,13 @@ export class AppComponent implements OnInit {
       this.displayFollowWarning = true;
     } else {
       this.displayFollowWarning = false;
-      
+
       // train model before following
       if (this.currentFollowStep < 0) {
-        if (!this.mlService.neuralNet) {
+        if (this.cleanPointsArray.length <= 0) {
           this.calculateCleanPoints();
+        }
+        if (!this.mlService.neuralNet) {
           this.mlService.trainNeuralNet();
         }
         this.currentFollowStep = 0;
@@ -599,7 +607,7 @@ export class AppComponent implements OnInit {
   /** moves bot to specific point in path */
   followPoint(step: number) {
     if (step) this.currentFollowStep = step;
-    else console.error('Undefined step to follow!'); 
+    else console.error('Undefined step to follow!');
     this.followPath();
   }
 }
