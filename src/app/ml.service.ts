@@ -22,6 +22,9 @@ export class MlService {
     while (newAngle > (Math.PI * 2)) {
       newAngle -= (Math.PI * 2);
     }
+    while (newAngle < 0) {
+      newAngle += (Math.PI * 2);
+    }
     this._botAngle = newAngle;
   }
   public botCenter: { x: number, y: number } = this.CONST_BOT_CENTER;

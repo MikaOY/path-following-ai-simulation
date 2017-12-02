@@ -33,7 +33,3 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 importing JS libraries into Angular apps - https://stackoverflow.com/questions/43476135/angular-4-cannot-find-name-require/43477099 
 
 # TODO
-
-TODO: intuitive follow path guides
-TODO: usage tooltips
-TODO: reset movement vars when resetting all

@@ -200,7 +200,7 @@ export class AppComponent implements OnInit {
         let latestCleanPoint = this.cleanPointsArray[this.cleanPointsArray.length - 1];
         let dist = Math.sqrt(((latestCleanPoint.x - messyPoint.x) ** 2 + (latestCleanPoint.y - messyPoint.y) ** 2));
 
-        if (dist > 30) {
+        if (dist > 40) {
           // do not add duplicates
           if (!this.cleanPointsArray.find((pt, i, a) => pt.x == messyPoint.x && pt.y == messyPoint.y)) {
             this.cleanPointsArray.push(messyPoint);
@@ -249,28 +249,27 @@ export class AppComponent implements OnInit {
       console.log('AUTO TRAINING INITIATED');
 
       // generate commands to train
-      let increment: number = 0.5;
+      let increment: number = 0.4;
       let lowerRange: number = 0;
       let upperRange: number = 3;
       let commands: number[][] = [];
       let angleArray: number[] = [];
-      for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 5)) {
+      for (var i = 0; i <= ( Math.PI); i += (Math.PI / 8)) {
         angleArray.push(i);
       }
       angleArray.forEach(angle => {
         // CANNOT have for loop here because it causes jams
         let array: number[] = [];
-        for (var index = increment; index < upperRange; index += increment) { array.push(index); }
+        for (var index = increment; index < upperRange; index += increment) { array.push(this.round(index, 1)); }
 
         array.forEach(num => {
           // increment x and y
           for (var j = increment; j < upperRange + increment; j += increment) {
-            commands.push([j, num, angle]);
-            commands.push([num, j, angle]);
+            commands.push([this.round(j, 1), this.round(num, 1), angle]);
+            commands.push([this.round(num, 1), this.round(j, 1), angle]);
           }
         });
       });
-      console.log('AUTO TRAIN: number of generated commands' + commands.length);
 
       // train on each command
       commands.forEach(cmd => {
@@ -296,6 +295,11 @@ export class AppComponent implements OnInit {
 
       resolve(null);
     });
+  }
+
+  round(value: number, precision: number) {
+    var multiplier = Math.pow(10, precision || 0);
+    return Math.round(value * multiplier) / multiplier;
   }
 
   /** get bot's current Cartesian position */
@@ -435,7 +439,7 @@ export class AppComponent implements OnInit {
         this.ctx.lineTo(pt.x, pt.y);
         this.ctx.moveTo(pt.x, pt.y);
         this.ctx.lineWidth = this.y;
-        this.ctx.strokeStyle = 'black';        
+        this.ctx.strokeStyle = 'black';
         this.ctx.stroke();
       }
     }
@@ -471,7 +475,7 @@ export class AppComponent implements OnInit {
     this.ctx.beginPath();
     this.ctx.moveTo(startX, startY);
     this.ctx.lineTo(startX + (changeX * this.currLinePercent), startY + (changeY * this.currLinePercent));
-    this.ctx.strokeStyle = 'red'; 
+    this.ctx.strokeStyle = 'red';
     this.ctx.stroke();
     this.currLinePercent += 0.04; // controls speed
     // keep looping until 100%
@@ -506,7 +510,7 @@ export class AppComponent implements OnInit {
     // Re-draw from the very beginning each time so there isn't tiny line spaces between each section 
     this.ctx.arc(x, y, r, startAngle, startAngle + drawToAngle, isCounterClock);
     // Draw
-    this.ctx.strokeStyle = 'red'; 
+    this.ctx.strokeStyle = 'red';
     this.ctx.stroke();
     // Increment percent
     if (isCounterClock) {
@@ -601,8 +605,8 @@ export class AppComponent implements OnInit {
         console.log('PATH: Current angle: (' + this.mlService.botAngle + ')');
         let cmd: number[][] = this.mlService.predictCmd(diff[0], diff[1], this.mlService.botAngle);
         console.log('PATH: Predicted motor commands: (' + cmd[0][0] + ', ' + cmd[0][1] + ')');
-
         this.moveBot(cmd[0][0], cmd[0][1]);
+        console.log('FOLLOW: bot angle AFTER step ' + this.mlService.botAngle);
       }
     }
   }
@@ -611,6 +615,7 @@ export class AppComponent implements OnInit {
   followPoint(step: number) {
     if (step) this.currentFollowStep = step;
     else console.error('Undefined step to follow!');
+    console.log('FOLLOW: bot angle before step ' + this.mlService.botAngle);
     this.followPath();
   }
 }

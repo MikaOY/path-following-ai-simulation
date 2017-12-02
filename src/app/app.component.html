@@ -49,7 +49,7 @@
         <div *ngIf="this.displayFollowWarning" class="alert alert-warning" role="alert">
           Please train model and draw path before testing.
         </div>
-        <div *ngIf="this.cleanPointsArray.length > 0 && this.mlService.neuralNet" style="margin-top:0.5em;" class="row">
+        <div *ngIf="this.cleanPointsArray.length > 0 && this.mlService.neuralNet && this.currentFollowStep != -1" style="margin-top:0.5em;" class="row">
           <div class="col-3">
             <h6>Step</h6>
             <p>{{ this.currentFollowStep + 1 }} of {{ this.cleanPointsArray.length }}</p>
