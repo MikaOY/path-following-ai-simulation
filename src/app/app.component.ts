@@ -33,12 +33,13 @@ export class AppComponent implements OnInit {
   pointsArray: { x: number, y: number }[] = [];
   cleanPointsArray: { x: number, y: number }[] = [];
   // store previously drawn shapes
-  // lines are stored with x and y as the start points and r and startAngle as the end points
+  // lines are stored with x and y as the start points and radius and startAngle as the end points
   pathsArray: {
     isArc: boolean, x: number, y: number, r: number, startAngle: number,
     endAngle: number, isCounterClock: boolean
   }[] = [];
   currentFollowStep: number = -1;
+  displayFollowWarning: boolean = false;
 
   constructor(public mlService: MlService) { }
 
@@ -227,8 +228,9 @@ export class AppComponent implements OnInit {
     let oldPos = this.getBotPos();
     let translation: number[] = this.moveBot(this.leftCmd, this.rightCmd);
     let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
-
     this.mlService.train(this.leftCmd, this.rightCmd, oldPos, newPos, this.mlService.botAngle);
+
+    this.displayFollowWarning = false;
   }
 
   autoTrainAsync() {
@@ -241,12 +243,12 @@ export class AppComponent implements OnInit {
       console.log('AUTO TRAINING INITIATED');
 
       // generate commands to train
-      let increment: number = 0.4;
+      let increment: number = 0.3;
       let lowerRange: number = 0;
-      let upperRange: number = 4;
+      let upperRange: number = 3;
       let commands: number[][] = [];
       let angleArray: number[] = [];
-      for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 6)) {
+      for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 5)) {
         angleArray.push(i);
       }
       angleArray.forEach(angle => {
@@ -280,13 +282,13 @@ export class AppComponent implements OnInit {
       });
 
       // reset visuals
-      this.autoTrainProgress = 0; 
+      this.autoTrainProgress = 0;
       this.reset(true);
       this.mlService.outputCommands.forEach(change => {
         console.log('AUTO TRAIN: an output ' + change.toString());
       });
 
-      resolve(null); 
+      resolve(null);
     });
   }
 
@@ -566,30 +568,38 @@ export class AppComponent implements OnInit {
 
   /** moves bot along path, using ML predictions; incrementally */
   followPath() {
-    // train model before following
-    if (this.currentFollowStep < 0) {
-      this.calculateCleanPoints();
-      this.mlService.trainNeuralNet();
-      this.currentFollowStep = 0;
-    }
-    if (this.currentFollowStep >= 0) {
-      // get point based on slowly incremented index, predict motor commands to get there, then execute
-      let currentPoint = this.cleanPointsArray[this.currentFollowStep];
+    if (this.mlService.inputPositionChanges.length == 0 || this.mlService.outputCommands.length == 0 || this.pointsArray.length == 0) {
+      this.displayFollowWarning = true;
+    } else {
+      this.displayFollowWarning = false;
+      
+      // train model before following
+      if (this.currentFollowStep < 0) {
+        if (!this.mlService.neuralNet) {
+          this.calculateCleanPoints();
+          this.mlService.trainNeuralNet();
+        }
+        this.currentFollowStep = 0;
+      }
+      if (this.currentFollowStep >= 0) {
+        // get point based on slowly incremented index, predict motor commands to get there, then execute
+        let currentPoint = this.cleanPointsArray[this.currentFollowStep];
 
-      let diff: number[] = this.mlService.calculatePosDifference(this.getBotPos(), [currentPoint.x, currentPoint.y]);
-      console.log('PATH: Point difference: (' + diff[0] + ', ' + diff[1] + ')');
-      console.log('PATH: Current angle: (' + this.mlService.botAngle + ')');
-      let cmd: number[][] = this.mlService.predictCmd(diff[0], diff[1], this.mlService.botAngle);
-      console.log('PATH: Predicted motor commands: (' + cmd[0][0] + ', ' + cmd[0][1] + ')');
+        let diff: number[] = this.mlService.calculatePosDifference(this.getBotPos(), [currentPoint.x, currentPoint.y]);
+        console.log('PATH: Point difference: (' + diff[0] + ', ' + diff[1] + ')');
+        console.log('PATH: Current angle: (' + this.mlService.botAngle + ')');
+        let cmd: number[][] = this.mlService.predictCmd(diff[0], diff[1], this.mlService.botAngle);
+        console.log('PATH: Predicted motor commands: (' + cmd[0][0] + ', ' + cmd[0][1] + ')');
 
-      this.moveBot(cmd[0][0], cmd[0][1]);
+        this.moveBot(cmd[0][0], cmd[0][1]);
+      }
     }
   }
 
-  /** moves bot to next point in path */
-  followNextPoint(moveSteps?: number) {
-    if (moveSteps) this.currentFollowStep += moveSteps;
-    else this.currentFollowStep++;
+  /** moves bot to specific point in path */
+  followPoint(step: number) {
+    if (step) this.currentFollowStep = step;
+    else console.error('Undefined step to follow!'); 
     this.followPath();
   }
 }

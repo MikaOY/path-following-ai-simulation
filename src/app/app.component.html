@@ -21,7 +21,7 @@
       <!-- command inputs to train movement -->
       <div class="options">
         <form>
-          <h3 class="inline">Train model</h3>
+          <h4 class="inline">Training</h4>
           <h6 class="inline" style="color:gray;">{{this.mlService.outputCommands.length}} training points</h6>
           <div class="form-group">
             <label>Left wheel speed</label>
@@ -37,21 +37,34 @@
           <i class="fa fa-magic" aria-hidden="true"></i>
           Auto train
         </button>
-
-        <mat-progress-bar *ngIf="this.autoTrainProgress != 100 && this.autoTrainProgress != 0" id="auto-train-progress" mode="value" 
+        <mat-progress-bar *ngIf="this.autoTrainProgress != 100 && this.autoTrainProgress != 0" id="auto-train-progress" mode="value"
           [value]="this.autoTrainProgress"></mat-progress-bar>
 
-        <button class="full-btn btn btn-success" (click)="followPath()">
+        <hr>
+
+        <h4 class="inline">Testing</h4>
+        <button *ngIf="this.currentFollowStep == -1" class="full-btn btn btn-success" (click)="followPath()">
           Follow path
         </button>
-        <button *ngIf="this.currentFollowStep >= 0 && this.currentFollowStep < this.cleanPointsArray.length" type="button" id="clr"
-          class="full-btn btn btn-light" (click)="followNextPoint(-1)">
-          Retry previous
-        </button>
-        <button *ngIf="this.currentFollowStep >= 0 && this.currentFollowStep < this.cleanPointsArray.length - 1" type="button" id="clr"
-          class="full-btn btn btn-light" (click)="followNextPoint()">
-          Next point
-        </button>
+        <div *ngIf="this.displayFollowWarning" class="alert alert-warning" role="alert">
+          Please train model and draw path before testing.
+        </div>
+        <div *ngIf="this.cleanPointsArray.length > 0 && this.mlService.neuralNet" style="margin-top:0.5em;" class="row">
+          <div class="col-3">
+            <h6>Step</h6>
+            <p>{{ this.currentFollowStep + 1 }} of {{ this.cleanPointsArray.length }}</p>
+          </div>
+          <div class="col-9 center-vertical">
+            <button *ngIf="this.currentFollowStep >= 0 && this.currentFollowStep < this.cleanPointsArray.length" type="button" 
+              class="step-btn btn btn-light" (click)="followPoint(this.currentFollowStep)">
+              Retry step
+            </button>
+            <button *ngIf="this.currentFollowStep >= 0 && this.currentFollowStep < this.cleanPointsArray.length - 1" type="button" 
+              class="step-btn btn btn-light" (click)="followPoint(this.currentFollowStep + 1)">
+              Next step
+            </button>
+          </div>
+        </div>
 
         <!-- Bootstrap popover warning
         <a tabindex="0" class="full-btn btn btn-success" role="button" data-toggle="popover" data-trigger="focus" data-placement="bottom"
