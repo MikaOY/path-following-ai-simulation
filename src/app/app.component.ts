@@ -67,16 +67,16 @@ export class AppComponent implements OnInit {
       this.canvasWidth = this.canvas.width;
       this.canvasHeight = this.canvas.height;
 
-      this.canvas.addEventListener("mousemove", (e) => {
+      this.canvas.addEventListener('mousemove', (e) => {
         this.findxy('move', e)
       }, false);
-      this.canvas.addEventListener("mousedown", (e) => {
+      this.canvas.addEventListener('mousedown', (e) => {
         this.findxy('down', e)
       }, false);
-      this.canvas.addEventListener("mouseup", (e) => {
+      this.canvas.addEventListener('mouseup', (e) => {
         this.findxy('up', e)
       }, false);
-      this.canvas.addEventListener("mouseout", (e) => {
+      this.canvas.addEventListener('mouseout', (e) => {
         this.findxy('out', e)
       }, false);
     }
@@ -133,13 +133,13 @@ export class AppComponent implements OnInit {
       this.dot_flag = true;
       if (this.dot_flag) {
         this.ctx.beginPath();
-        this.ctx.fillStyle = "black";
+        this.ctx.fillStyle = 'black';
         this.ctx.fillRect(this.currX, this.currY, 2, 2);
         this.ctx.closePath();
         this.dot_flag = false;
       }
     }
-    if (res == 'up' || res == "out") {
+    if (res == 'up' || res == 'out') {
       this.flag = false;
     }
     if (res == 'move') {
@@ -156,7 +156,7 @@ export class AppComponent implements OnInit {
   draw() {
     this.ctx.moveTo(this.prevX, this.prevY);
     this.ctx.lineTo(this.currX, this.currY);
-    this.ctx.strokeStyle = "black";
+    this.ctx.strokeStyle = 'black';
     this.ctx.lineWidth = this.y;
     this.ctx.stroke();
 
@@ -166,7 +166,7 @@ export class AppComponent implements OnInit {
   reset(skip?: boolean, angle?: number) {
     let m;
     if (!skip) {
-      m = confirm("Are you sure you want to reset the robot and clear all paths?");
+      m = confirm('Are you sure you want to reset the robot and clear all paths?');
     }
     if (m || skip) {
       this.pointsArray = [];
@@ -249,7 +249,7 @@ export class AppComponent implements OnInit {
       console.log('AUTO TRAINING INITIATED');
 
       // generate commands to train
-      let increment: number = 0.3;
+      let increment: number = 0.5;
       let lowerRange: number = 0;
       let upperRange: number = 3;
       let commands: number[][] = [];
@@ -415,6 +415,7 @@ export class AppComponent implements OnInit {
       if (path.isArc) { // draw arc
         this.ctx.beginPath();
         this.ctx.arc(path.x, path.y, path.r, path.startAngle, path.endAngle, path.isCounterClock);
+        this.ctx.strokeStyle = 'red';
         this.ctx.stroke();
       } else { // draw line
         this.ctx.beginPath();
@@ -433,8 +434,8 @@ export class AppComponent implements OnInit {
       } else {
         this.ctx.lineTo(pt.x, pt.y);
         this.ctx.moveTo(pt.x, pt.y);
-        this.ctx.strokeStyle = "black";
         this.ctx.lineWidth = this.y;
+        this.ctx.strokeStyle = 'black';        
         this.ctx.stroke();
       }
     }
@@ -470,6 +471,7 @@ export class AppComponent implements OnInit {
     this.ctx.beginPath();
     this.ctx.moveTo(startX, startY);
     this.ctx.lineTo(startX + (changeX * this.currLinePercent), startY + (changeY * this.currLinePercent));
+    this.ctx.strokeStyle = 'red'; 
     this.ctx.stroke();
     this.currLinePercent += 0.04; // controls speed
     // keep looping until 100%
@@ -504,6 +506,7 @@ export class AppComponent implements OnInit {
     // Re-draw from the very beginning each time so there isn't tiny line spaces between each section 
     this.ctx.arc(x, y, r, startAngle, startAngle + drawToAngle, isCounterClock);
     // Draw
+    this.ctx.strokeStyle = 'red'; 
     this.ctx.stroke();
     // Increment percent
     if (isCounterClock) {
@@ -545,7 +548,7 @@ export class AppComponent implements OnInit {
     // draw ref points
     // bot start point
     this.ctx.beginPath();
-    this.ctx.fillStyle = 'pink';
+    this.ctx.fillStyle = 'red';
     this.ctx.strokeStyle = 'black';
     this.ctx.arc(startPos.x, startPos.y, 10, 0, 2 * Math.PI);
     this.ctx.fill();
