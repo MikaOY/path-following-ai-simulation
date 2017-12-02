@@ -28,7 +28,7 @@ export class AppComponent implements OnInit {
   // training //
   leftCmd: number;
   rightCmd: number;
-  public autoTrainProgress: number = 0; 
+  public autoTrainProgress: number = 0;
   // working //
   pointsArray: { x: number, y: number }[] = [];
   cleanPointsArray: { x: number, y: number }[] = [];
@@ -231,18 +231,22 @@ export class AppComponent implements OnInit {
     this.mlService.train(this.leftCmd, this.rightCmd, oldPos, newPos, this.mlService.botAngle);
   }
 
+  autoTrainAsync() {
+    return this.autoTrainActual();
+  }
+
   /** train with many auto generated points */
-  autoTrain(): Promise<any> {
+  autoTrainActual(): Promise<any> {
     return new Promise((resolve, reject) => {
       console.log('AUTO TRAINING INITIATED');
 
       // generate commands to train
-      let increment: number = 0.5;
+      let increment: number = 0.4;
       let lowerRange: number = 0;
-      let upperRange: number = 3;
+      let upperRange: number = 4;
       let commands: number[][] = [];
       let angleArray: number[] = [];
-      for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 5)) {
+      for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 6)) {
         angleArray.push(i);
       }
       angleArray.forEach(angle => {
@@ -263,8 +267,8 @@ export class AppComponent implements OnInit {
       // train on each command
       commands.forEach(cmd => {
         // update progress visuals
-        let index = commands.indexOf(cmd); 
-        this.autoTrainProgress = index / commands.length * 100;  
+        let index = commands.indexOf(cmd);
+        this.autoTrainProgress = index / commands.length * 100;
 
         // get initial and final bot position
         let oldPos = this.getBotPos();
@@ -275,14 +279,15 @@ export class AppComponent implements OnInit {
         this.reset(true, cmd[2]);
       });
 
-      // reset bot
+      // reset visuals
+      this.autoTrainProgress = 0; 
       this.reset(true);
       this.mlService.outputCommands.forEach(change => {
         console.log('AUTO TRAIN: an output ' + change.toString());
       });
 
       resolve(null); 
-    })
+    });
   }
 
   /** get bot's current Cartesian position */

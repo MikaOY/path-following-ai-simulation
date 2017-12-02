@@ -33,12 +33,12 @@
           </div>
         </form>
         <button class="btn btn-primary" (click)="train()">Train</button>
-        <button class="btn btn-primary" (click)="autoTrain()">
+        <button class="btn btn-primary" (click)="autoTrainAsync()">
           <i class="fa fa-magic" aria-hidden="true"></i>
           Auto train
         </button>
 
-        <mat-progress-bar *ngIf="this.autoTrainProgress != 1 && this.autoTrainProgress != 0" id="auto-train-progress" mode="value" 
+        <mat-progress-bar *ngIf="this.autoTrainProgress != 100 && this.autoTrainProgress != 0" id="auto-train-progress" mode="value" 
           [value]="this.autoTrainProgress"></mat-progress-bar>
 
         <button class="full-btn btn btn-success" (click)="followPath()">
@@ -52,8 +52,6 @@
           class="full-btn btn btn-light" (click)="followNextPoint()">
           Next point
         </button>
-
-        <h5 *ngIf="this.mlService.neuralNet">Neural net ready!</h5>
 
         <!-- Bootstrap popover warning
         <a tabindex="0" class="full-btn btn btn-success" role="button" data-toggle="popover" data-trigger="focus" data-placement="bottom"
