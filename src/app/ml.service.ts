@@ -183,7 +183,7 @@ export class MlService {
     // TODO: figure out why the const is not const
     this.CONST_BOT_CENTER = { x: this.CONST_BOT_START.x + (this.botWidth / 2), y: this.CONST_BOT_START.y - (this.botHeight / 2) };
     this.botCenter = this.CONST_BOT_CENTER;
-    this.botAngle = angle ? angle : this.CONST_BOT_ANGLE;
+    this.botAngle = angle != undefined ? angle : this.CONST_BOT_ANGLE;
     if (angle) {
       console.log('SERVICE RESET: custom angle = ' + angle);
     }
