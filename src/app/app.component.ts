@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
   // training //
   leftCmd: number;
   rightCmd: number;
+  formBotAngle: number;
   public autoTrainProgress: number = 0;
   // working //
   pointsArray: { x: number, y: number }[] = [];
@@ -223,9 +224,13 @@ export class AppComponent implements OnInit {
 
     // get initial and final bot position
     let oldPos = this.getBotPos();
+    if (this.formBotAngle != undefined) {
+      this.reset(true, this.formBotAngle * Math.PI);
+    }
+    let startAngle = this.mlService.botAngle;
     let translation: number[] = this.moveBot(this.leftCmd, this.rightCmd);
     let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
-    this.mlService.train(this.leftCmd, this.rightCmd, oldPos, newPos, this.mlService.botAngle);
+    this.mlService.train(this.leftCmd, this.rightCmd, oldPos, newPos, startAngle);
 
     this.displayFollowWarning = false;
   }
@@ -269,12 +274,15 @@ export class AppComponent implements OnInit {
 
         // get initial and final bot position
         let oldPos = this.getBotPos();
-        console.log('angle check for current bot = ' + this.mlService.botAngle + ', for command = ' + cmd[2]);
+        // reset bot
+        this.mlService.resetBot(cmd[2]);
+        if (this.mlService.botAngle != cmd[2]) {
+          console.error('BBEEEP BEEEP ANGLES NOT RIGHT');
+        }
         let translation: number[] = this.moveBot(cmd[0], cmd[1], true);
         let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
         this.mlService.train(cmd[0], cmd[1], oldPos, newPos, cmd[2]);
-        // reset bot
-        this.mlService.resetBot(cmd[2]);
+        
       });
 
       // reset visuals
@@ -403,10 +411,10 @@ export class AppComponent implements OnInit {
     let endPos: { x: number, y: number } = { x: endX, y: endY };
     this.currAnglePercent = 0;
     if (skipAni) {
-      // this.pathsArray.push({
-      //     isArc: true, x: centerX, y: centerY, r: r, startAngle: this.startAngle,
-      //     endAngle: endAngle, isCounterClock: isCounterClock
-      //   });
+      this.pathsArray.push({
+          isArc: true, x: centerX, y: centerY, r: r, startAngle: this.startAngle,
+          endAngle: endAngle, isCounterClock: isCounterClock
+        });
     } else {
       this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
     }
@@ -427,7 +435,6 @@ export class AppComponent implements OnInit {
         // for lines, r = endX and startAngle = endY
         this.ctx.lineTo(path.r, path.startAngle);
         this.ctx.stroke();
-        console.log('hi');
       }
     });
 
