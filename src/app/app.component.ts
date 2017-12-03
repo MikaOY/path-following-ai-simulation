@@ -252,23 +252,23 @@ export class AppComponent implements OnInit {
       console.log('AUTO TRAINING INITIATED');
 
       // generate commands to train
-      let increment: number = 0.4;
+      let increment: number = 0.35;
       let lowerRange: number = 0;
       let upperRange: number = 3;
       let commands: number[][] = [];
       let angleArray: number[] = [];
-      for (var i = 0; i <= (2* Math.PI); i += (Math.PI / 8)) {
+      for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 12)) {
         angleArray.push(i);
       }
       angleArray.forEach(angle => {
         // CANNOT have for loop here because it causes jams
         let array: number[] = []; // generate nums 0.4, 0.8, 1.2, etc
-        for (var index = increment; index < upperRange + increment; index += increment) { array.push(this.round(index, 1)); }
+        for (var index = increment; index < upperRange + increment; index += increment) { array.push(this.round(index, 2)); }
 
         array.forEach(num => {
           // increment x and y
           for (var j = increment; j < upperRange + increment; j += increment) {
-            commands.push([this.round(j, 1), this.round(num, 1), angle]);
+            commands.push([this.round(j, 2), this.round(num, 2), angle]);
           }
         });
       });
