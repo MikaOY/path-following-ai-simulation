@@ -31,6 +31,10 @@
             <label>Right wheel speed</label>
             <input [(ngModel)]="rightCmd" type="number" name="y" class="form-control" placeholder="revolutions/s">
           </div>
+          <div class="form-group">
+            <label>Angle - PI * x</label>
+            <input [(ngModel)]="formBotAngle" type="number" name="botAngle" class="form-control" placeholder="* PI">
+          </div>
         </form>
         <button class="btn btn-primary" (click)="train()">Train</button>
         <button class="btn btn-primary" (click)="autoTrainAsync()">

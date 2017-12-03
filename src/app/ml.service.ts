@@ -159,7 +159,7 @@ export class MlService {
    * @returns {[[leftCmd, rightCmd]]} - change in Cartesian position, given as a 1D array with x and y component of translation
    */
   predictCmd(changeX: number, changeY: number, angle: number): number[][] {
-    if (this.neuralNet && changeX && changeY && angle) {
+    if (this.neuralNet && changeX != undefined && changeY != undefined && angle != undefined) {
       return this.neuralNet.predict([[changeX, changeY, angle]]);
     } else {
       console.error('Neural net undefined, cannot make prediction!');
@@ -173,10 +173,11 @@ export class MlService {
     // TODO: figure out why the const is not const
     this.CONST_BOT_CENTER = { x: this.CONST_BOT_START.x + (this.botWidth / 2), y: this.CONST_BOT_START.y - (this.botHeight / 2) };
     this.botCenter = this.CONST_BOT_CENTER;
-    this.botAngle = angle ? angle : this.CONST_BOT_ANGLE;
+    this.botAngle = angle != undefined ? angle : this.CONST_BOT_ANGLE;
     if (angle) {
       console.log('SERVICE RESET: custom angle = ' + angle);
+    } else {
+       console.log('SERVICE RESET: botAngle reset to ' + this.botAngle);
     }
-    console.log('SERVICE RESET: botAngle reset to ' + this.botAngle);
   }
 }

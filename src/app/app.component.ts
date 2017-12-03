@@ -28,6 +28,7 @@ export class AppComponent implements OnInit {
   // training //
   leftCmd: number;
   rightCmd: number;
+  formBotAngle: number;
   public autoTrainProgress: number = 0;
   // working //
   pointsArray: { x: number, y: number }[] = [];
@@ -224,6 +225,10 @@ export class AppComponent implements OnInit {
 
     // get initial and final bot position
     let oldPos = this.getBotPos();
+    if (this.formBotAngle != undefined) {
+      this.reset(true, this.formBotAngle * Math.PI);
+    }
+    let startAngle = this.mlService.botAngle;
     let translation: number[] = this.moveBot(this.leftCmd, this.rightCmd);
     let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
     this.mlService.recordData(this.leftCmd, this.rightCmd, oldPos, newPos, this.mlService.botAngle);
@@ -270,11 +275,14 @@ export class AppComponent implements OnInit {
 
         // get initial and final bot position
         let oldPos = this.getBotPos();
+        // reset bot
+        this.mlService.resetBot(cmd[2]);
+        if (this.mlService.botAngle != cmd[2]) {
+          console.error('BBEEEP BEEEP ANGLES NOT RIGHT');
+        }
         let translation: number[] = this.moveBot(cmd[0], cmd[1], true);
         let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
         this.mlService.recordData(cmd[0], cmd[1], oldPos, newPos, cmd[2]);
-        // reset bot
-        this.mlService.resetBot(cmd[2]);
       });
 
       // reset visuals
@@ -284,6 +292,7 @@ export class AppComponent implements OnInit {
       // });
      
       this.reset(true, undefined, true);
+      console.log('this store paths length = ' + this.pathsArray.length);
       this.drawStoredPaths();
       resolve(null);
     });
@@ -333,11 +342,11 @@ export class AppComponent implements OnInit {
       if (!skipAni) {
         this.animateBotAlongLine(this.mlService.botCenter.x, this.mlService.botCenter.y,
           xChange, yChange);
-      } else {
+      } else { // training store path
         let endX = this.mlService.botCenter.x + xChange;
         let endY = this.mlService.botCenter.y + yChange;
         this.pathsArray.push({
-          isArc: true, x: this.mlService.botCenter.x, y: this.mlService.botCenter.y, r: endX, startAngle: endY,
+          isArc: false, x: this.mlService.botCenter.x, y: this.mlService.botCenter.y, r: endX, startAngle: endY,
           endAngle: undefined, isCounterClock: undefined
         });
       }
