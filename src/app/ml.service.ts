@@ -61,6 +61,8 @@ export class MlService {
     this.neuralNet.train(this.inputPositionChanges, this.outputCommands);
     console.log('ML-NN: Prediction with pos change [100,200, Pi] is '
       + this.neuralNet.predict([[100, 200, Math.PI]]).toString());
+      let json = this.neuralNet.toJSON();
+    console.log(json);
   }
 
   /**

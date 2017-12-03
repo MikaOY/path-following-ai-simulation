@@ -162,6 +162,8 @@ export class AppComponent implements OnInit {
     if (m || skip) {
       this.pointsArray = [];
       this.cleanPointsArray = [];
+
+
       this.startAngle = 0;
       this.currAnglePercent = 0;
       this.currentFollowStep = -1;
@@ -169,6 +171,8 @@ export class AppComponent implements OnInit {
 
       if (!skipPaths) {
          this.pathsArray = [];
+         this.specialArray = [];
+         this.endpointsArray = [];
          console.log('paths array emptied');
       }
       // reset visuals
@@ -294,7 +298,6 @@ export class AppComponent implements OnInit {
       // });
      
       this.reset(true, undefined, true);
-      console.log('this store paths length = ' + this.pathsArray.length);
       this.drawStoredPaths();
       resolve(null);
     });
@@ -428,11 +431,11 @@ export class AppComponent implements OnInit {
       } else {
         this.endpointsArray.push({ x: endX, y: endY });
       }
-      
     } else {
       this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
     }
 
+    console.log('ANI: pos change (' + xChange + ', ' + yChange + ')');
     return [xChange, yChange];
   }
 
