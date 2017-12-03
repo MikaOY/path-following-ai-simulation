@@ -231,7 +231,7 @@ export class AppComponent implements OnInit {
     let startAngle = this.mlService.botAngle;
     let translation: number[] = this.moveBot(this.leftCmd, this.rightCmd);
     let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
-    this.mlService.recordData(this.leftCmd, this.rightCmd, oldPos, newPos, this.mlService.botAngle);
+    this.mlService.recordData(this.leftCmd, this.rightCmd, oldPos, newPos, startAngle);
 
     this.displayFollowWarning = false;
   }
