@@ -39,7 +39,7 @@ export class MlService {
   constructor() { }
 
   /** train ML model with user-given commands */
-  train(leftCmd: number, rightCmd: number, pos: number[], newPos: number[], angle: number) {
+  recordData(leftCmd: number, rightCmd: number, pos: number[], newPos: number[], angle: number) {
     if (!(pos && newPos && leftCmd && rightCmd)) {
       console.log('ML: old position = ' + pos);
       console.log('ML: new position = ' + newPos);
@@ -48,13 +48,12 @@ export class MlService {
       console.error('Not enough defined params to train model!');
     } else {
       let diff: number[] = this.calculatePosDifference(pos, newPos);
-      this.record(leftCmd, rightCmd, diff[0], diff[1], angle);
 
-      // train the model on training data
-      this.regressionModel = new MLR(this.inputPositionChanges, this.outputCommands);
-      console.log('ML: Latest regression model = ' + this.regressionModel);
-      // TODO: remove logs below      
-      console.log('ML: Prediction with pos change [100,200, Pi] is ' + this.regressionModel.predict([[100, 200, Math.PI]]).toString());
+      // plot left + right command, pos change X + Y as one point in ML training data
+      this.inputPositionChanges.push([diff[0], diff[1], angle]);
+      console.log('ML: Recording input = ' + '[ ' + diff[0] + ', ' + diff[1] + ', ' + angle + ' ]');
+      this.outputCommands.push([leftCmd, rightCmd]);
+      console.log('ML: Recording output = ' + '[ ' + leftCmd + ', ' + rightCmd + ' ]');
     }
   }
 
@@ -64,15 +63,6 @@ export class MlService {
     this.neuralNet.train(this.inputPositionChanges, this.outputCommands);
     console.log('ML-NN: Prediction with pos change [100,200, Pi] is '
       + this.neuralNet.predict([[100, 200, Math.PI]]).toString());
-  }
-
-  /** record command and result of executing it as ML training data */
-  record(leftCmd, rightCmd, xChange, yChange, angle) {
-    // plot left + right command, pos change X + Y as one point in ML training data
-    this.inputPositionChanges.push([xChange, yChange, angle]);
-    console.log('ML: Recording input = ' + '[ ' + xChange + ', ' + yChange + ', ' + angle + ' ]');
-    this.outputCommands.push([leftCmd, rightCmd]);
-    console.log('ML: Recording output = ' + '[ ' + leftCmd + ', ' + rightCmd + ' ]');
   }
 
   /**

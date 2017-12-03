@@ -32,6 +32,7 @@ export class AppComponent implements OnInit {
   // working //
   pointsArray: { x: number, y: number }[] = [];
   cleanPointsArray: { x: number, y: number }[] = [];
+  storedInputs; 
   // store previously drawn shapes
   // lines are stored with x and y as the start points and radius and startAngle as the end points
   pathsArray: {
@@ -225,7 +226,7 @@ export class AppComponent implements OnInit {
     let oldPos = this.getBotPos();
     let translation: number[] = this.moveBot(this.leftCmd, this.rightCmd);
     let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
-    this.mlService.train(this.leftCmd, this.rightCmd, oldPos, newPos, this.mlService.botAngle);
+    this.mlService.recordData(this.leftCmd, this.rightCmd, oldPos, newPos, this.mlService.botAngle);
 
     this.displayFollowWarning = false;
   }
@@ -271,7 +272,7 @@ export class AppComponent implements OnInit {
         let oldPos = this.getBotPos();
         let translation: number[] = this.moveBot(cmd[0], cmd[1], true);
         let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
-        this.mlService.train(cmd[0], cmd[1], oldPos, newPos, cmd[2]);
+        this.mlService.recordData(cmd[0], cmd[1], oldPos, newPos, cmd[2]);
         // reset bot
         this.mlService.resetBot(cmd[2]);
       });
@@ -589,7 +590,8 @@ export class AppComponent implements OnInit {
         if (this.cleanPointsArray.length <= 0) {
           this.calculateCleanPoints();
         }
-        if (!this.mlService.neuralNet) {
+        if (!this.mlService.neuralNet || this.storedInputs != this.mlService.inputPositionChanges) {
+          this.storedInputs = this.mlService.inputPositionChanges; 
           this.mlService.trainNeuralNet();
         }
         this.currentFollowStep = 0;
