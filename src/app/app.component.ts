@@ -33,6 +33,8 @@ export class AppComponent implements OnInit {
   // working //
   pointsArray: { x: number, y: number }[] = [];
   cleanPointsArray: { x: number, y: number }[] = [];
+  endpointsArray: { x: number, y: number }[] = [];
+  specialArray: { x: number, y: number }[] = [];
   storedInputs; 
   // store previously drawn shapes
   // lines are stored with x and y as the start points and radius and startAngle as the end points
@@ -326,6 +328,7 @@ export class AppComponent implements OnInit {
     // calculate arc / path of body based on speeds given //
     let isCounterClock: boolean;
     let centerX, centerY, r, endAngle, innerArcLength, currAngle: number;
+    let initialAngle = this.mlService.botAngle;
 
     // 1 - determine direction of turn if turning; else simply draw straight path
     if (leftSpeed > rightSpeed) {
@@ -345,10 +348,15 @@ export class AppComponent implements OnInit {
       } else { // training store path
         let endX = this.mlService.botCenter.x + xChange;
         let endY = this.mlService.botCenter.y + yChange;
-        this.pathsArray.push({
-          isArc: false, x: this.mlService.botCenter.x, y: this.mlService.botCenter.y, r: endX, startAngle: endY,
-          endAngle: undefined, isCounterClock: undefined
-        });
+        if (this.mlService.botAngle == Math.PI/2){
+          this.pathsArray.push({
+            isArc: false, x: this.mlService.botCenter.x, y: this.mlService.botCenter.y, r: endX, startAngle: endY,
+            endAngle: undefined, isCounterClock: undefined
+          });
+          this.specialArray.push({ x: endX, y: endY });
+        } else {
+          this.endpointsArray.push({ x: endX, y: endY });
+        }
       }
 
       // update bot center
@@ -411,10 +419,16 @@ export class AppComponent implements OnInit {
     let endPos: { x: number, y: number } = { x: endX, y: endY };
     this.currAnglePercent = 0;
     if (skipAni) {
-      this.pathsArray.push({
-          isArc: true, x: centerX, y: centerY, r: r, startAngle: this.startAngle,
-          endAngle: endAngle, isCounterClock: isCounterClock
-        });
+      if (initialAngle == Math.PI / 2) {
+        this.pathsArray.push({
+            isArc: true, x: centerX, y: centerY, r: r, startAngle: this.startAngle,
+            endAngle: endAngle, isCounterClock: isCounterClock
+          });
+          this.specialArray.push({ x: endX, y: endY });
+      } else {
+        this.endpointsArray.push({ x: endX, y: endY });
+      }
+      
     } else {
       this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
     }
@@ -460,6 +474,25 @@ export class AppComponent implements OnInit {
       this.ctx.fillStyle = 'orange';
       this.ctx.fill();
     });
+
+    // draw end points
+    this.endpointsArray.forEach(pt => {
+      // draw circle at point
+      this.ctx.beginPath();
+      this.ctx.arc(pt.x, pt.y, 2, 0, 2 * Math.PI);
+      this.ctx.fillStyle = 'blue';
+      this.ctx.fill();
+    });
+
+    // draw special points
+    this.specialArray.forEach(pt => {
+      // draw circle at point
+      this.ctx.beginPath();
+      this.ctx.arc(pt.x, pt.y, 5, 0, 2 * Math.PI);
+      this.ctx.fillStyle = 'orange';
+      this.ctx.fill();
+    });
+    
   }
 
   /** 
