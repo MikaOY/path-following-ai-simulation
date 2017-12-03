@@ -51,19 +51,6 @@ export class AppComponent implements OnInit {
     if (this.canvas.getContext) {
       this.ctx = this.canvas.getContext('2d');
 
-      // // rectangles
-      // ctx.fillStyle = 'rgb(200, 0, 0)';
-      // ctx.fillRect(10, 10, 50, 50);
-      // ctx.fillStyle = 'rgba(0, 0, 200, 0.5)';
-      // ctx.fillRect(30, 30, 50, 50);
-
-      // // paths
-      // ctx.beginPath();
-      // ctx.moveTo(200, 80);
-      // ctx.lineTo(100, 75);
-      // ctx.lineTo(100, 25);
-      // ctx.fill();
-
       this.canvasWidth = this.canvas.width;
       this.canvasHeight = this.canvas.height;
 
@@ -163,7 +150,7 @@ export class AppComponent implements OnInit {
     this.pointsArray.push({ x: this.prevX, y: this.prevY });
   }
 
-  reset(skip?: boolean, angle?: number) {
+  reset(skip?: boolean, angle?: number, skipPaths?: boolean) {
     let m;
     if (!skip) {
       m = confirm('Are you sure you want to reset the robot and clear all paths?');
@@ -171,11 +158,15 @@ export class AppComponent implements OnInit {
     if (m || skip) {
       this.pointsArray = [];
       this.cleanPointsArray = [];
-      this.pathsArray = [];
       this.startAngle = 0;
       this.currAnglePercent = 0;
       this.currentFollowStep = -1;
       this.mlService.resetBot(angle);
+
+      if (!skipPaths) {
+         this.pathsArray = [];
+         console.log('paths array emptied');
+      }
       // reset visuals
       this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
       this.drawBot(0, this.mlService.CONST_BOT_CENTER.x, this.mlService.CONST_BOT_CENTER.y);
@@ -254,19 +245,18 @@ export class AppComponent implements OnInit {
       let upperRange: number = 3;
       let commands: number[][] = [];
       let angleArray: number[] = [];
-      for (var i = 0; i <= ( Math.PI); i += (Math.PI / 8)) {
+      for (var i = 0; i <= (2* Math.PI); i += (Math.PI / 8)) {
         angleArray.push(i);
       }
       angleArray.forEach(angle => {
         // CANNOT have for loop here because it causes jams
-        let array: number[] = [];
-        for (var index = increment; index < upperRange; index += increment) { array.push(this.round(index, 1)); }
+        let array: number[] = []; // generate nums 0.4, 0.8, 1.2, etc
+        for (var index = increment; index < upperRange + increment; index += increment) { array.push(this.round(index, 1)); }
 
         array.forEach(num => {
           // increment x and y
           for (var j = increment; j < upperRange + increment; j += increment) {
             commands.push([this.round(j, 1), this.round(num, 1), angle]);
-            commands.push([this.round(num, 1), this.round(j, 1), angle]);
           }
         });
       });
@@ -283,16 +273,17 @@ export class AppComponent implements OnInit {
         let newPos: number[] = [oldPos[0] + translation[0], oldPos[1] + translation[1]];
         this.mlService.train(cmd[0], cmd[1], oldPos, newPos, cmd[2]);
         // reset bot
-        this.reset(true, cmd[2]);
+        this.mlService.resetBot(cmd[2]);
       });
 
       // reset visuals
       this.autoTrainProgress = 0;
-      this.reset(true);
-      this.mlService.outputCommands.forEach(change => {
-        console.log('AUTO TRAIN: an output ' + change.toString());
-      });
-
+      // this.mlService.outputCommands.forEach(change => {
+      //   console.log('AUTO TRAIN: an output ' + change.toString());
+      // });
+     
+      this.reset(true, undefined, true);
+      this.drawStoredPaths();
       resolve(null);
     });
   }
@@ -339,11 +330,15 @@ export class AppComponent implements OnInit {
       let xChange = d * Math.cos(this.mlService.botAngle);
       let yChange = -(d * Math.sin(this.mlService.botAngle)); // negated because y positive is down
       if (!skipAni) {
-        let endX = this.mlService.botCenter.x + xChange;
-        let endY = this.mlService.botCenter.y + yChange;
-
         this.animateBotAlongLine(this.mlService.botCenter.x, this.mlService.botCenter.y,
           xChange, yChange);
+      } else {
+        let endX = this.mlService.botCenter.x + xChange;
+        let endY = this.mlService.botCenter.y + yChange;
+        this.pathsArray.push({
+          isArc: true, x: this.mlService.botCenter.x, y: this.mlService.botCenter.y, r: endX, startAngle: endY,
+          endAngle: undefined, isCounterClock: undefined
+        });
       }
 
       // update bot center
@@ -390,13 +385,13 @@ export class AppComponent implements OnInit {
     // end position coordinates
     let endX = centerX + (r * Math.cos(angle));
     let endY = isCounterClock ? centerY - (r * Math.sin(angle)) : centerY - (r * Math.sin(angle));
-    console.log('ANI: endingX = ' + endX + ', endingY = ' + endY);
+    //console.log('ANI: endingX = ' + endX + ', endingY = ' + endY);
     this.ctx.fillRect(endX, endY, 20, 20);
 
     // subtract from start coordinates to get change
     let xChange = endX - startX;
     let yChange = (endY - startY);
-    console.log('ANI: xChange = ' + xChange + ', yChange = ' + yChange);
+    //console.log('ANI: xChange = ' + xChange + ', yChange = ' + yChange);
     // update bot center 
     this.mlService.botCenter.x += xChange;
     this.mlService.botCenter.y += yChange;
@@ -406,7 +401,10 @@ export class AppComponent implements OnInit {
     let endPos: { x: number, y: number } = { x: endX, y: endY };
     this.currAnglePercent = 0;
     if (skipAni) {
-
+      this.pathsArray.push({
+          isArc: true, x: centerX, y: centerY, r: r, startAngle: this.startAngle,
+          endAngle: endAngle, isCounterClock: isCounterClock
+        });
     } else {
       this.animateBotAlongPath(centerX, centerY, r, this.startAngle, endAngle, isCounterClock, startPos, endPos);
     }
