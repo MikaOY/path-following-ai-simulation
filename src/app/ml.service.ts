@@ -1,6 +1,5 @@
 
 import { Injectable } from '@angular/core';
-import MLR from 'ml-regression-multivariate-linear';
 import FeedForwardNeuralNetworks from 'ml-fnn';
 
 @Injectable()
@@ -31,7 +30,6 @@ export class MlService {
   public timeUnit: number = 1 // number of seconds wheel rotation takes to complete 
 
   // service properties
-  private regressionModel;
   public neuralNet;
   public inputPositionChanges: number[][] = [];
   public outputCommands: number[][] = [];
