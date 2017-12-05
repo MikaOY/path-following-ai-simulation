@@ -254,10 +254,10 @@ export class AppComponent implements OnInit {
       // generate commands to train
       let increment: number = 0.2;
       let lowerRange: number = 0;
-      let upperRange: number = 2.4;
+      let upperRange: number = 3;
       let commands: number[][] = [];
       let angleArray: number[] = [];
-      for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 12)) {
+      for (var i = 0; i <= (Math.PI / 2); i += (Math.PI / 30)) {
         angleArray.push(i);
       }
       angleArray.forEach(angle => {
