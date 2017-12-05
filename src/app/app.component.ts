@@ -252,12 +252,12 @@ export class AppComponent implements OnInit {
       console.log('AUTO TRAINING INITIATED');
 
       // generate commands to train
-      let increment: number = 0.35;
+      let increment: number = 0.1;
       let lowerRange: number = 0;
-      let upperRange: number = 3;
+      let upperRange: number = 2;
       let commands: number[][] = [];
       let angleArray: number[] = [];
-      for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 12)) {
+      for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 25)) {
         angleArray.push(i);
       }
       angleArray.forEach(angle => {

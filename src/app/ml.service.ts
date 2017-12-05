@@ -57,12 +57,14 @@ export class MlService {
 
   /** train ML model with user-given commands */
   trainNeuralNet() {
-    this.neuralNet = new FeedForwardNeuralNetworks();
+    let options = {
+      hiddenLayers: [10],
+      iterations: 100,
+      learningRate: 0.005,
+      activation: 'logistic'
+    };
+    this.neuralNet = new FeedForwardNeuralNetworks(options);
     this.neuralNet.train(this.inputPositionChanges, this.outputCommands);
-    console.log('ML-NN: Prediction with pos change [100,200, Pi] is '
-      + this.neuralNet.predict([[100, 200, Math.PI]]).toString());
-      let json = this.neuralNet.toJSON();
-    console.log(json);
   }
 
   /**
@@ -177,7 +179,7 @@ export class MlService {
     if (angle) {
       console.log('SERVICE RESET: custom angle = ' + angle);
     } else {
-       console.log('SERVICE RESET: botAngle reset to ' + this.botAngle);
+      console.log('SERVICE RESET: botAngle reset to ' + this.botAngle);
     }
   }
 }
