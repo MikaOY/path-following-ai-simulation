@@ -1,6 +1,5 @@
 
 import { Injectable } from '@angular/core';
-import FeedForwardNeuralNetworks from 'ml-fnn';
 
 @Injectable()
 export class MlService {
@@ -30,11 +29,16 @@ export class MlService {
   public timeUnit: number = 1 // number of seconds wheel rotation takes to complete 
 
   // service properties
-  public neuralNet;
+  public PLS; 
+  public model;
   public inputPositionChanges: number[][] = [];
   public outputCommands: number[][] = [];
 
-  constructor() { }
+  constructor() {
+    System.import('../../node_modules/ml-pls/src/index').then(file => {
+      this.PLS = file.PLS; 
+    });
+  }
 
   /** train ML model with user-given commands */
   recordData(leftCmd: number, rightCmd: number, pos: number[], newPos: number[], angle: number) {
@@ -56,13 +60,13 @@ export class MlService {
   }
 
   /** train ML model with user-given commands */
-  trainNeuralNet() {
-    this.neuralNet = new FeedForwardNeuralNetworks();
-    this.neuralNet.train(this.inputPositionChanges, this.outputCommands);
-    console.log('ML-NN: Prediction with pos change [100,200, Pi] is '
-      + this.neuralNet.predict([[100, 200, Math.PI]]).toString());
-      let json = this.neuralNet.toJSON();
-    console.log(json);
+  trainModel() {
+    let options = {
+      latentVectors: 3,
+      tolerance: 1e-4
+    };
+    this.model = new this.PLS(options);
+    this.model.train(this.inputPositionChanges, this.outputCommands);
   }
 
   /**
@@ -159,8 +163,8 @@ export class MlService {
    * @returns {[[leftCmd, rightCmd]]} - change in Cartesian position, given as a 1D array with x and y component of translation
    */
   predictCmd(changeX: number, changeY: number, angle: number): number[][] {
-    if (this.neuralNet && changeX != undefined && changeY != undefined && angle != undefined) {
-      return this.neuralNet.predict([[changeX, changeY, angle]]);
+    if (this.model && changeX != undefined && changeY != undefined && angle != undefined) {
+      return this.model.predict([[changeX, changeY, angle]]);
     } else {
       console.error('Neural net undefined, cannot make prediction!');
     }
@@ -177,7 +181,7 @@ export class MlService {
     if (angle) {
       console.log('SERVICE RESET: custom angle = ' + angle);
     } else {
-       console.log('SERVICE RESET: botAngle reset to ' + this.botAngle);
+      console.log('SERVICE RESET: botAngle reset to ' + this.botAngle);
     }
   }
 }

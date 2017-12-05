@@ -252,9 +252,9 @@ export class AppComponent implements OnInit {
       console.log('AUTO TRAINING INITIATED');
 
       // generate commands to train
-      let increment: number = 0.35;
+      let increment: number = 0.2;
       let lowerRange: number = 0;
-      let upperRange: number = 3;
+      let upperRange: number = 2.4;
       let commands: number[][] = [];
       let angleArray: number[] = [];
       for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 12)) {
@@ -635,9 +635,9 @@ export class AppComponent implements OnInit {
         if (this.cleanPointsArray.length <= 0) {
           this.calculateCleanPoints();
         }
-        if (!this.mlService.neuralNet || this.storedInputs != this.mlService.inputPositionChanges) {
+        if (!this.mlService.model || this.storedInputs != this.mlService.inputPositionChanges) {
           this.storedInputs = this.mlService.inputPositionChanges; 
-          this.mlService.trainNeuralNet();
+          this.mlService.trainModel();
         }
         this.currentFollowStep = 0;
       }
