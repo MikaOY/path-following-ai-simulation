@@ -60,8 +60,8 @@ export class MlService {
     let options = {
       hiddenLayers: [10],
       iterations: 100,
-      learningRate: 0.005,
-      activation: 'logistic'
+      learningRate: 0.01,
+      activation: 'tanh'
     };
     this.neuralNet = new FeedForwardNeuralNetworks(options);
     this.neuralNet.train(this.inputPositionChanges, this.outputCommands);

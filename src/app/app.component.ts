@@ -199,7 +199,7 @@ export class AppComponent implements OnInit {
         let latestCleanPoint = this.cleanPointsArray[this.cleanPointsArray.length - 1];
         let dist = Math.sqrt(((latestCleanPoint.x - messyPoint.x) ** 2 + (latestCleanPoint.y - messyPoint.y) ** 2));
 
-        if (dist > 40) {
+        if (dist > 50) {
           // do not add duplicates
           if (!this.cleanPointsArray.find((pt, i, a) => pt.x == messyPoint.x && pt.y == messyPoint.y)) {
             this.cleanPointsArray.push(messyPoint);
@@ -252,12 +252,12 @@ export class AppComponent implements OnInit {
       console.log('AUTO TRAINING INITIATED');
 
       // generate commands to train
-      let increment: number = 0.1;
+      let increment: number = 0.3;
       let lowerRange: number = 0;
-      let upperRange: number = 2;
+      let upperRange: number = 3;
       let commands: number[][] = [];
       let angleArray: number[] = [];
-      for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 25)) {
+      for (var i = 0; i <= (2 * Math.PI); i += (Math.PI / 8)) {
         angleArray.push(i);
       }
       angleArray.forEach(angle => {
